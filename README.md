@@ -89,9 +89,23 @@ The framework demonstrated state-of-the-art performance in both case studies.
 - The model yielded an **R² of 0.910** for the Theft category, explaining over 90% of the variance.
 - Feature importance analysis revealed distinct drivers for different crime types (e.g., transport accessibility for Theft, street network density for Vehicle Offences).
 
-![Feature Importance for Crime](graph&output/feature_heatmap.png)
+![Crime Trends](graph&output/Time-Series%Plot%of%Actual%vs.%Predicted%Counts.png)
+_Temporal trends of crime categories in London_
+
+![Model Performance](graph&output/Time-Series%20Plot%20of%20Actual%20vs.%20Predicted%20Theft%20Counts.png)
+_Actual vs. predicted theft counts demonstrating model accuracy_
 
 ### Housing Price Estimation
 
 - The model outperformed baselines with a **15.01% MAE improvement** and an **R² of 0.801**.
 - The results confirmed the model's ability to capture spatial spillover effects in the housing market.
+
+![Housing Price Trends](graph&output/London%20House%20Price%20Trends%20Over%20Time.png)
+_Quarterly median house price trends in London_
+
+![Study Area](graph&output/Map%20of%20the%20London%20Study%20Area.png)
+_Study area: LSOAs in Greater London_
+
+![Research Flow](graph&output/Overview%20of%20the%20Research%20Flow.png)
+_Research methodology and workflow_
+
