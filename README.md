@@ -501,3 +501,19 @@ The framework provides actionable insights through attention-based feature impor
   <img src="graph&output/feature_heatmap.png" alt="Feature Importance Heatmap" width="800"/>
   <p><em>Figure 14: Feature importance heatmap revealing distinct patterns across crime categories and geographic contexts</em></p>
 </div>
+
+**Theft Predictions** - Transport-Centric Profile:
+- **MeanPTAL** (0.240): Highest importance - transport hubs concentrate victims and provide escape routes
+- **StationsWithin500m** (0.122): Reinforces transport accessibility theory
+- **Policy Implication**: Focus security resources on high-accessibility areas
+
+**Vehicle Offences** - Infrastructure-Centric Profile:
+- **StreetSegments** (0.088): Complex street networks provide more parking opportunities
+- **StreetLength_m** (0.085): Longer street networks correlate with vehicle density
+- **Policy Implication**: Enhanced surveillance in areas with complex street layouts
+
+**Violence Against Person** - Socioeconomic-Centric Profile:
+- **MeanPTAL** (0.094): Transport accessibility remains important
+- **Education_HighLevel_pct** (0.069): Educational attainment inversely related to violence
+- **Land Use Features**: Mixed land use creates interaction opportunities
+- **Policy Implication**: Multi-faceted interventions addressing social and environmental factors
