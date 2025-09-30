@@ -418,45 +418,131 @@ jupyter notebook housing_final.ipynb
 
 ## 📈 Results
 
-### 🚔 Crime Forecasting Performance
+The framework was rigorously evaluated through comprehensive ablation studies across two distinct urban prediction tasks, demonstrating both high accuracy and cross-domain generalizability. The results provide compelling evidence for the effectiveness of the unified spatio-temporal architecture.
 
-The framework achieved **state-of-the-art performance** across all crime categories, significantly outperforming baseline models:
+### 🚔 Case Study I: Urban Crime Forecasting
 
-#### **Quantitative Results**
-| Crime Category | MAE Reduction | R² Score | RMSE | MAPE |
-|----------------|---------------|----------|------|------|
-| **Theft** | **34.15%** | **0.910** | 2.84 | 12.3% |
-| **Vehicle Offences** | **28.7%** | **0.847** | 1.92 | 15.1% |
-| **Violence** | **31.2%** | **0.883** | 3.15 | 14.8% |
+The first validation tested the framework's ability to predict monthly crime counts for three prevalent categories: **Theft**, **Vehicle Offences**, and **Violence Against the Person**. These categories exhibit unique, non-stationary temporal trends with varying degrees of seasonality and volatility.
 
-#### **Baseline Comparisons**
-- **vs. LSTM**: 25-35% improvement across all metrics
-- **vs. Simple GCN**: 15-25% enhancement from temporal modeling
+#### **Quantitative Performance**
 
-<div align="center">
-  <img src="graph&output/crime_prediction_line.png" alt="Crime Prediction Results" width="800"/>
-  <p><em>Figure 11: Detailed theft prediction results showing model accuracy over time periods</em></p>
-</div>
+The ablation study results provide definitive evidence of the framework's effectiveness, with hierarchical performance improvements across all metrics:
 
-### 🏠 Housing Price Estimation Performance
+| Crime Category | Pure LSTM | No Ext. Adjacency | **Full Model** | MAE Improvement |
+|----------------|-----------|-------------------|----------------|-----------------|
+| **Theft** | MAE: 2.44, RMSE: 16.90 | MAE: 1.95, RMSE: 5.61 | **MAE: 1.61, RMSE: 4.33** | **34.15%** |
+| **Violence** | MAE: 1.97, RMSE: 3.32 | MAE: 1.88, RMSE: 2.62 | **MAE: 1.73, RMSE: 2.51** | **12.23%** |
+| **Vehicle Offences** | MAE: 1.16, RMSE: 1.65 | MAE: 1.14, RMSE: 1.58 | **MAE: 1.13, RMSE: 1.53** | **1.94%** |
 
-#### **Market Prediction Results**  
-- **15.01% MAE improvement** over baseline econometric models
-- **R² = 0.801** explaining 80%+ of price variance
-- **MAPE = 8.7%** well within acceptable forecasting bounds
-
-### 🔍 Feature Importance Analysis
-
-The framework provides **interpretable insights** into urban dynamics through attention-based feature importance:
+**Key Findings:**
+- **Hierarchical Improvement**: Introduction of multimodal features reduces MAE by ~20%, followed by spatial modeling providing additional ~18% improvement for theft
+- **Task Dependency**: Spatial graph contribution varies significantly by crime type (17.67% for theft vs 0.55% for vehicle offences)
+- **Exceptional Accuracy**: R² of 0.910 for theft prediction, explaining over 90% of the variance
 
 <div align="center">
-  <img src="graph&output/feature_heatmap.png" alt="Feature Importance" width="800"/>
-  <p><em>Figure 12: Feature importance heatmap across different prediction tasks and geographic areas</em></p>
+  <img src="graph&output/Time-Series%20Plot%20of%20Actual%20vs.%20Predicted%20Theft%20Counts.png" alt="Theft Prediction Scatter" width="600"/>
+  <p><em>Figure 11: Scatter plot showing strong linear relationship between predicted and actual theft counts (R² = 0.910)</em></p>
 </div>
 
-#### **Crime Drivers** (Top 5)
-1. **Transport Access** (0.23): High PTAL areas show different crime patterns
-2. **Population Density** (0.19): Dense areas have higher theft rates
-3. **Street Connectivity** (0.17): Well-connected areas enable quick escape routes
-4. **Public Sentiment** (0.15): Negative sentiment correlates with crime hotspots  
-5. **Education Levels** (0.12): Higher education areas have lower crime rates
+#### **Model Validation and Generalization**
+
+<div align="center">
+  <img src="graph&output/crime_prediction_line.png" alt="Crime Prediction Time Series" width="800"/>
+  <p><em>Figure 12: Time-series comparison showing Full Model predictions (blue dashed) closely tracking actual values (black solid) versus Pure LSTM baseline (red dashed) across nine LSOA examples</em></p>
+</div>
+
+The training process demonstrates excellent convergence without overfitting:
+
+<div align="center">
+  <img src="graph&output/Training%20and%20Validation%20Loss%20for%20the%20Theft%20Prediction%20Model.png" alt="Training Loss" width="600"/>
+  <p><em>Figure 13: Training and validation loss curves showing smooth convergence over 100 epochs with no signs of overfitting</em></p>
+</div>
+
+### 🏠 Case Study II: Housing Price Estimation
+
+To validate generalizability, the framework was adapted to predict quarterly median house prices—a phenomenon with distinct temporal signatures compared to crime data.
+
+#### **Cross-Domain Performance**
+
+| Model Variant | MAE (£) | RMSE (£) | R² | Improvement |
+|---------------|---------|----------|----| ------------|
+| Pure LSTM | 94,081 | 174,180 | 0.7557 | Baseline |
+| No External Adjacency | 82,781 | 165,915 | 0.7783 | 12.01% |
+| **Full Model** | **79,963** | **157,189** | **0.8010** | **15.01%** |
+
+**Key Insights:**
+- **Successful Adaptation**: Framework effectively captures spatial spillover effects in property markets
+- **Spatial Value**: Clear improvement from No Adjacency to Full Model confirms spatial dependencies
+- **Strong Performance**: R² of 0.801 explains 80%+ of price variance
+- **Feature Dominance**: Multimodal features provide larger gains (12.01%) than spatial graph (3.40%)
+
+### 🔍 Component Contribution Analysis
+
+A systematic analysis quantified the value added by each architectural component, revealing fundamental differences in urban phenomena:
+
+| Prediction Task | Feature Improvement | Spatial Improvement | Overall Improvement |
+|----------------|-------------------|-------------------|-------------------|
+| **Theft** | 20.02% | 17.67% | **34.15%** |
+| **Violence** | 4.80% | 7.80% | **12.23%** |
+| **Vehicle Offences** | 1.39% | 0.55% | **1.94%** |
+| **Housing Prices** | 12.01% | 3.40% | **15.01%** |
+
+**Phenomenon Classification:**
+- **Feature-Dominant** (Housing): Intrinsic area characteristics drive prediction (hedonic model)
+- **Balanced** (Theft): Equal contribution from features and spatial contagion
+- **Spatial-Dominant** (Violence): Geographic proximity more predictive than static features
+- **Resilient** (Vehicle Offences): Less dependent on modeled factors, suggesting other dynamics
+
+### 🎯 Interpretability Analysis
+
+The framework provides actionable insights through attention-based feature importance analysis, generating distinct "feature fingerprints" for different urban phenomena:
+
+<div align="center">
+  <img src="graph&output/feature_heatmap.png" alt="Feature Importance Heatmap" width="800"/>
+  <p><em>Figure 14: Feature importance heatmap revealing distinct patterns across crime categories and geographic contexts</em></p>
+</div>
+
+#### **Crime-Specific Insights**
+
+**Theft Predictions** - Transport-Centric Profile:
+- **MeanPTAL** (0.240): Highest importance - transport hubs concentrate victims and provide escape routes
+- **StationsWithin500m** (0.122): Reinforces transport accessibility theory
+- **Policy Implication**: Focus security resources on high-accessibility areas
+
+**Vehicle Offences** - Infrastructure-Centric Profile:
+- **StreetSegments** (0.088): Complex street networks provide more parking opportunities
+- **StreetLength_m** (0.085): Longer street networks correlate with vehicle density
+- **Policy Implication**: Enhanced surveillance in areas with complex street layouts
+
+**Violence Against Person** - Socioeconomic-Centric Profile:
+- **MeanPTAL** (0.094): Transport accessibility remains important
+- **Education_HighLevel_pct** (0.069): Educational attainment inversely related to violence
+- **Land Use Features**: Mixed land use creates interaction opportunities
+- **Policy Implication**: Multi-faceted interventions addressing social and environmental factors
+
+#### **Urban Planning Applications**
+
+The framework's interpretability enables evidence-based policy recommendations:
+
+1. **Crime Prevention**: Target interventions based on crime-specific feature profiles
+2. **Transport Planning**: Acknowledge security implications of accessibility improvements  
+3. **Housing Policy**: Leverage spatial spillover understanding for market interventions
+4. **Resource Allocation**: Prioritize areas based on predictive risk factors
+
+### 🏆 Cross-Domain Validation Success
+
+The empirical results provide compelling evidence for the central thesis that **a single, adaptable architecture can effectively model diverse urban phenomena**:
+
+#### **Generalizability Metrics**
+- **Consistent Outperformance**: Full model achieves best results across all tasks and metrics
+- **Architecture Flexibility**: Same core structure adapts to different temporal patterns (monthly vs quarterly)
+- **Spatial Transferability**: Graph convolution mechanism effective for both crime clustering and price gradients
+- **Feature Robustness**: Attention mechanism successfully weights different feature types across domains
+
+#### **Methodological Validation**
+- **No Task-Specific Tuning**: Identical hyperparameters across both applications
+- **Consistent Preprocessing**: Unified data pipeline handles heterogeneous sources
+- **Scalable Performance**: Framework maintains accuracy across 4,835 spatial units
+- **Interpretable Results**: Attention weights provide domain-appropriate insights
+
+This cross-domain success validates the shift from specialized, single-purpose models toward unified, interpretable frameworks capable of addressing the full spectrum of urban analytics challenges.
