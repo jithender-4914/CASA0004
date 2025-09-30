@@ -25,24 +25,6 @@ If you use this work in your research, please cite:
 
 **Last Updated**: September 2025  
 **Version**: 0.9.9  
-**Status**: Active Developmentnal Network (GCN), a Long Short-Term Memory (LSTM) network, and attention mechanisms to model diverse urban phenomena.
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Abstract](#abstract)
-- [Key Contributions](#key-contributions)
-- [Study Area](#study-area)
-- [Framework Architecture](#framework-architecture)
-- [Case Studies](#case-studies)
-- [Dataset](#dataset)
-- [Repository Structure](#repository-structure)
-- [Setup and Usage](#setup-and-usage)
-- [Results](#results)
-- [Model Details](#model-details)
-- [Citation](#citation)
-- [License](#license)
-- [Contact](#contact)
 
 ## Overview
 
@@ -244,35 +226,7 @@ A core innovation of this research is the **principled data fusion pipeline** th
 
 ### 🏗️ Feature Engineering
 
-The integrated dataset comprises **15 static external features** across five thematic categories:
-
-#### 1. **Demographics** (3 features)
-- Population density and composition
-- Education levels (higher education percentage)
-- Age distribution characteristics
-
-#### 2. **Geographic Context** (2 features)  
-- **Area**: LSOA spatial extent (km²)
-- **Land Use Diversity**: Shannon diversity index of land use types
-
-#### 3. **Transportation Access** (4 features)
-- **PTAL Score**: Public Transport Accessibility Level (0-6 scale)
-- **Station Distance**: Proximity to nearest rail/tube stations
-- **Transport Density**: Number of transport nodes per area
-- **Connectivity Index**: Network centrality measures
-
-#### 4. **Street Network** (4 features)
-- **Street Length**: Total road network length per LSOA
-- **Street Density**: Road length per unit area
-- **Intersection Count**: Number of road junctions
-- **Segment Density**: Road connectivity measure
-
-#### 5. **Public Sentiment** (2 features)
-- **Venue Sentiment**: Public sentiment scores from Google venue reviews
-- **Sentiment Processing**: BERT-based natural language processing
-- **Aggregation**: Mean sentiment per LSOA with spatial interpolation
-
-### 🔗 Feature Relationships
+The integrated dataset comprises **15 static external features** spanning multiple urban domains.
 
 <div align="center">
   <img src="graph&output/Feature%20Correlation%20Heatmap.png" alt="Feature Correlation" width="700"/>
@@ -309,39 +263,28 @@ The integrated dataset comprises **15 static external features** across five the
 
 ### 🏗️ Architecture Specifications
 
-#### **Key Components**
+#### **Layer-by-Layer Architecture Breakdown**
 
 <div align="center">
 
-**Table 1: List of Symbols and Acronyms**
+**Table 2: Model Architecture Breakdown**
 
 </div>
 
-| Symbol | Description | Context |
-|--------|-------------|---------|
-| **Greek Letters** | | |
-| σ | Activation function | GCN formula |
-| α<sub>t</sub> | Attention weight | Temporal attention |
-| ⊙ | Element-wise product | Gating mechanism |
-| **Model Components** | | |
-| G, V, E | Graph, Vertices, Edges | Foundational structure |
-| N | Number of nodes (LSOAs) | Graph size |
-| A | Adjacency matrix | Defines connections |
-| Â | A+I | Self-loops |
-| D̂ | Degree matrix of Â | GCN normalization |
-| X<sub>temp</sub> | Time-series input | Primary model input |
-| X<sub>ext</sub> | External features input | Primary model input |
-| B, T, F | Batch, Time, Features | Input dimensions |
-| D<sub>emb</sub> | Embedding dimension | Latent space size |
-| h<sub>t</sub> | Hidden state at time t | LSTM output |
-| c | Context vector | Aggregation |
-| Ŷ | Predicted value | Model output |
-| **Acronyms** | | |
-| GCN | Graph Convolutional Network | Spatial modeling |
-| LSTM | Long Short-Term Memory | Temporal modeling |
-| BERT | Bidirectional Encoder Representations from Transformers | Sentiment analysis |
-| PTAL | Public Transport Accessibility Level | Key input feature |
-| LSOA | Lower Layer Super Output Area | Spatial unit of analysis |
+| # | Layer (Type) | Input Shape | Output Shape | Details |
+|---|--------------|-------------|--------------|---------|
+| 1 | Temporal Embedding (Linear) | (B, T, N, 1) | (B, T, N, 64) | Projects 1D sequence into 64D latent space |
+| 2 | External Embedding (MLP) | (N, F) | (N, 64) | Embeds static features into 64D space |
+| - | Initial Reshape | (B, T, N, 64) | (B×T, N, 64) | Flattens batch and time dimensions |
+| 3 | MultiHeadGraphConv 1 | (B×T, N, 64) | (B×T, N, 64) | 1st GCN block (4 heads) with residual connection |
+| 4 | MultiHeadGraphConv 2 | (B×T, N, 64) | (B×T, N, 64) | 2nd GCN block (4 heads) captures 2-hop relations |
+| - | Temporal Reshape | (B×T, N, 64) | (B, T, N, 64) | Restores temporal dimension for fusion |
+| 5 | Cross-Attention & Gating | (B, T, N, 64) | (B, T, N, 64) | Fuses external embedding into the sequence |
+| 6 | LSTM | (B, T, N, 64) | (B, T, N, 128) | Processes sequence to capture temporal dynamics |
+| 7 | Temporal Attention | (B, T, N, 128) | (B, N, 128) | Aggregates information across time |
+| 8 | Prediction Head (MLP) | (B, N, 128) | (B, N, 1) | Two-layer MLP (128→32→1) for final prediction |
+
+**Notation**: B = Batch size, T = Time steps, N = Number of nodes (LSOAs), F = Feature dimensions
 
 #### **Computational Requirements**
 - **Training Time**: 
