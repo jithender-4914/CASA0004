@@ -1,0 +1,18 @@
+Feature_Name,Data_Type,Description,Category
+AvgPrice,float64,Average housing price (Mar 2023),Economic
+MEAN_PTAL_2023,float64,Public Transport Accessibility Level,Transport_Accessibility
+MAX_AI,float64,Maximum Accessibility Index,Transport_Accessibility
+MIN_AI,float64,Minimum Accessibility Index,Transport_Accessibility
+Population,float64,Population count,Demographics
+MeanSentiment,float64,Average sentiment score from reviews,Social
+SentimentSD,float64,Standard deviation of sentiment scores,Social
+ReviewCount,float64,Total number of reviews,Social
+NearestStation_m,float64,Distance to nearest transport station (meters),Transport_Accessibility
+StationsWithin500m,float64,Number of stations within 500m,Transport_Accessibility
+NearestRail_m,float64,Distance to nearest rail line (meters),Transport_Accessibility
+StreetLength_m,float64,Total street length (meters),Urban_Form
+StreetDensity_m_per_m2,float64,Street density (m/m²),Urban_Form
+StreetSegments,float64,Number of street segments,Urban_Form
+LandUse_Diversity,float64,Land use diversity index,Urban_Form
+LandUse_Types,float64,Number of different land use types,Urban_Form
+LandUse_Area,float64,Total land use area,Urban_Form

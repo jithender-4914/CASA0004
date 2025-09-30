@@ -1,0 +1,10 @@
+{
+  "python.defaultInterpreterPath": "/Users/goffy/miniconda3/bin/python",
+  "python.terminal.activateEnvironment": true,
+  "jupyter.kernels.trusted": [
+    "/Users/goffy/miniconda3/bin/python"
+  ],
+  "jupyter.defaultKernel": "/Users/goffy/miniconda3/bin/python",
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.typeCheckingMode": "basic"
+}

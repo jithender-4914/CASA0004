@@ -1,0 +1,16 @@
+Feature_Name,Data_Type,Description,Category,Missing_Before_Imputation,Imputation_Method
+AvgPrice,float64 (standardized),Average housing price in March 2023 (£),Economic,384,Median
+MEAN_PTAL_2023,float64 (standardized),Public Transport Accessibility Level (0-6 scale),Transport_Accessibility,1489,Median
+Population,float64 (standardized),Total population count in LSOA,Demographics,0,None
+Area_km2,float64 (standardized),Geographic area in square kilometers,Geographic,4719,Median
+MeanSentiment,float64 (standardized),Average sentiment score from online reviews (-1 to 1),Social,2041,Median
+SentimentSD,float64 (standardized),Standard deviation of sentiment scores,Social,3147,Median
+ReviewCount,float64 (standardized),Total number of reviews analyzed,Social,2041,Median
+NearestStation_m,float64 (standardized),Distance to nearest transport station (meters),Transport_Accessibility,0,None
+StationsWithin500m,float64 (standardized),Number of transport stations within 500m radius,Transport_Accessibility,0,None
+NearestRail_m,float64 (standardized),Distance to nearest rail line (meters),Transport_Accessibility,0,None
+StreetLength_m,float64 (standardized),Total length of street network (meters),Urban_Form,0,None
+StreetDensity_m_per_m2,float64 (standardized),Street network density (meters per square meter),Urban_Form,0,None
+StreetSegments,float64 (standardized),Number of individual street segments,Urban_Form,0,None
+LandUse_Diversity,float64 (standardized),Number of different land use types,Urban_Form,0,None
+LandUse_Area,float64 (standardized),Total area covered by land use polygons (square meters),Urban_Form,0,None

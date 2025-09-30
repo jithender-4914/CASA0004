@@ -1,0 +1,17 @@
+Feature_Name,Description,Data_Type,Unit,Source,Processing,Missing_Values_Handled,Standardized
+LSOA_CODE,Lower Layer Super Output Area unique identifier,object,Categorical,ONS LSOA boundaries,No processing - identifier field,None (identifier),No
+AvgPrice,Average housing price in the LSOA,float64,British Pounds (£),HM Land Registry,"Averaged by LSOA, spatial imputation applied",Spatial correlation-based imputation,Yes
+MEAN_PTAL_2023,Public Transport Accessibility Level (PTAL) mean score,float64,"Score (0-6, higher = better access)",Transport for London,"Mean PTAL score by LSOA, spatial imputation applied",Spatial correlation-based imputation,Yes
+Population,Total population count in the LSOA,float64,Number of people,ONS Census/Population estimates,"Population count by LSOA, spatial imputation applied",Spatial correlation-based imputation,Yes
+Area_km2,Area of the LSOA in square kilometers,float64,Square kilometers (km²),ONS LSOA boundaries,"Calculated from polygon geometry, converted m² to km²",Calculated from spatial geometry,Yes
+MeanSentiment,Mean sentiment score from social media/reviews,float64,"Sentiment score (-1 to 1, higher = more positive)",Social media sentiment analysis,"Mean sentiment by LSOA, spatial imputation applied",Spatial correlation-based imputation,Yes
+SentimentSD,Standard deviation of sentiment scores,float64,Standard deviation (0-1),Social media sentiment analysis,"Standard deviation of sentiment by LSOA, spatial imputation applied",Spatial correlation-based imputation,Yes
+ReviewCount,Number of reviews/social media posts,float64,Count,Social media sentiment analysis,"Count of reviews by LSOA, spatial imputation applied",Spatial correlation-based imputation,Yes
+NearestStation_m,Distance to nearest railway/underground station,float64,Meters,Transport for London station locations,Euclidean distance from LSOA centroid to nearest station,Spatial correlation-based imputation,Yes
+StationsWithin500m,Number of stations within 500m radius,float64,Count,Transport for London station locations,Count of stations within 500m buffer of LSOA centroid,Spatial correlation-based imputation,Yes
+NearestRail_m,Distance to nearest rail network,float64,Meters,Transport for London rail network,Euclidean distance from LSOA centroid to nearest rail line,Spatial correlation-based imputation,Yes
+StreetLength_m,Total length of street network within LSOA,float64,Meters,OpenStreetMap/Transport for London,Sum of street lengths intersecting LSOA polygon,Spatial correlation-based imputation,Yes
+StreetDensity_m_per_m2,Street network density (street length per unit area),float64,Meters per square meter,Calculated from street network and LSOA area,StreetLength_m / Area_m2,Spatial correlation-based imputation,Yes
+StreetSegments,Number of street segments within LSOA,float64,Count,OpenStreetMap/Transport for London,Count of street segments intersecting LSOA polygon,Spatial correlation-based imputation,Yes
+LandUse_Diversity,Number of different land use types in LSOA,float64,Count,London Land Use Survey,Count of unique land use categories intersecting LSOA,Spatial correlation-based imputation,Yes
+LandUse_Area,Total area covered by different land uses,float64,Square meters,London Land Use Survey,Sum of land use polygon areas intersecting LSOA,Spatial correlation-based imputation,Yes
