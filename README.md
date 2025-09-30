@@ -95,15 +95,3 @@ The framework demonstrated state-of-the-art performance in both case studies.
 
 - The model outperformed baselines with a **15.01% MAE improvement** and an **R² of 0.801**.
 - The results confirmed the model's ability to capture spatial spillover effects in the housing market.
-
-## Citation
-
-If you use this code or research in your work, please cite the following paper:
-
-> Guo, Y. (2024). *Multimodal Spatio-Temporal Fusion: A Generalizable GCN-LSTM with Attention Framework for Urban Application*. [Journal/Conference], [Volume(Issue)], [pages].
-
-*(Note: Please update the citation details once the paper is published.)*
-
-## License
-
-This project is licensed under the terms of the [LICENSE](LICENSE) file.
