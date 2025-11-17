@@ -19,7 +19,7 @@ If you use this work in your research, please cite:
 ### Institutional Affiliation
 - **Institution**: University College London (UCL)
 - **Department**: Centre for Advanced Spatial Analysis (CASA)
-- **Research Group**: MRes Urban Spatial Science
+- **Research Group**: MRes Saptial Data Science & Visualization
 
 ---
 
