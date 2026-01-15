@@ -439,11 +439,6 @@ cd ex3_transport/
 jupyter notebook test_full.ipynb
 ```
 
-## 📈 Results
-
-The framework was rigorously evaluated through comprehensive ablation studies across three
-jupyter notebook housing_final.ipynb
-```
 
 ## 📈 Results
 
