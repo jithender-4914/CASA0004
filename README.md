@@ -35,7 +35,7 @@ If you use this work in your research, please cite:
 ## Overview
 
 <div align="center">
-  <img src="graph&output/Overview%20of%20the%20Research%20Flow.png" alt="Research Flow" width="800"/>
+  <img src="graph&output&publication/Overview%20of%20the%20Research%20Flow.png" alt="Research Flow" width="800"/>
   <p><em>Figure 1: Research workflow overview</em></p>
 </div>
 
@@ -236,7 +236,7 @@ The framework's **generalizability** was rigorously tested across three heteroge
 4. Policy-critical domain with clear decision-support applications
 
 <div align="center">
-  <img src="graph&output/Crime%20Trends%20in%20London%20Over%20Time%20by%20Category.png" alt="Crime Trends" width="800"/>
+  <img src="graph&output&publication/Crime%20Trends%20in%20London%20Over%20Time%20by%20Category.png" alt="Crime Trends" width="800"/>
   <p><em>Figure 7: Temporal trends in crime categories across London showing seasonal patterns and COVID-19 impact</em></p>
 </div>
 
@@ -263,7 +263,7 @@ The framework's **generalizability** was rigorously tested across three heteroge
 4. Tests framework's capacity to adapt to new domains
 
 <div align="center">
-  <img src="graph&output/London%20House%20Price%20Trends%20Over%20Time.png" alt="Housing Trends" width="800"/>
+  <img src="graph&output&publication/London%20House%20Price%20Trends%20Over%20Time.png" alt="Housing Trends" width="800"/>
   <p><em>Figure 8: London house price trends over time showing market cycles and regional variations</em></p>
 </div>
 
@@ -371,7 +371,7 @@ This dual-domain approach ensures the framework's **robustness** across differen
 A core innovation of this research is the **principled data fusion pipeline** that integrates heterogeneous urban datasets into a unified, model-ready feature matrix at the LSOA level. This comprehensive dataset enables robust spatio-temporal modeling across diverse urban applications.
 
 <div align="center">
-  <img src="graph&output/The%20Multimodal%20Data%20Processing%20Pipeline.png" alt="Data Processing Pipeline" width="900"/>
+  <img src="graph&output&publication/The%20Multimodal%20Data%20Processing%20Pipeline.png" alt="Data Processing Pipeline" width="900"/>
   <p><em>Figure 9: Multimodal data processing pipeline for integrating diverse urban datasets</em></p>
 </div>
 
@@ -380,7 +380,7 @@ A core innovation of this research is the **principled data fusion pipeline** th
 The integrated dataset comprises **15 static external features** spanning multiple urban domains.
 
 <div align="center">
-  <img src="graph&output/Feature%20Correlation%20Heatmap.png" alt="Feature Correlation" width="700"/>
+  <img src="graph&output&publication/Feature%20Correlation%20Heatmap.png" alt="Feature Correlation" width="700"/>
   <p><em>Figure 10: Feature correlation heatmap revealing multi-dimensional urban relationships</em></p>
 </div>
 
@@ -496,7 +496,7 @@ CASA0004/
 │   ├── StationFootfall_Merged.csv      # Transport dataset
 │   └── merge_analysis.png              # Data analysis plots
 │
-├── �📈 graph&output/                # Visualizations and results
+├── �📈 graph&output&publication/                # Visualizations and results
 │   ├── [architecture_diagrams]/        # Framework visualization
 │   ├── [performance_plots]/            # Results and metrics
 │   └── [analysis_figures]/             # Feature analysis plots
@@ -602,21 +602,21 @@ The ablation study results provide definitive evidence of the framework's effect
 - **Exceptional Accuracy**: R² of 0.910 for theft prediction, explaining over 90% of the variance
 
 <div align="center">
-  <img src="graph&output/Time-Series%20Plot%20of%20Actual%20vs.%20Predicted%20Theft%20Counts.png" alt="Theft Prediction Scatter" width="600"/>
+  <img src="graph&output&publication/Time-Series%20Plot%20of%20Actual%20vs.%20Predicted%20Theft%20Counts.png" alt="Theft Prediction Scatter" width="600"/>
   <p><em>Figure 11: Scatter plot showing strong linear relationship between predicted and actual theft counts (R² = 0.910)</em></p>
 </div>
 
 #### **Model Validation and Generalization**
 
 <div align="center">
-  <img src="graph&output/crime_prediction_line.png" alt="Crime Prediction Time Series" width="800"/>
+  <img src="graph&output&publication/crime_prediction_line.png" alt="Crime Prediction Time Series" width="800"/>
   <p><em>Figure 12: Time-series comparison showing Full Model predictions (blue dashed) closely tracking actual values (black solid) versus Pure LSTM baseline (red dashed) across nine LSOA examples</em></p>
 </div>
 
 The training process demonstrates excellent convergence without overfitting:
 
 <div align="center">
-  <img src="graph&output/Training%20and%20Validation%20Loss%20for%20the%20Theft%20Prediction%20Model.png" alt="Training Loss" width="600"/>
+  <img src="graph&output&publication/Training%20and%20Validation%20Loss%20for%20the%20Theft%20Prediction%20Model.png" alt="Training Loss" width="600"/>
   <p><em>Figure 13: Training and validation loss curves showing smooth convergence over 100 epochs with no signs of overfitting</em></p>
 </div>
 
@@ -691,7 +691,7 @@ A systematic analysis quantified the value added by each architectural component
 The framework provides actionable insights through attention-based feature importance analysis, generating distinct "feature fingerprints" for different urban phenomena:
 
 <div align="center">
-  <img src="graph&output/feature_heatmap.png" alt="Feature Importance Heatmap" width="800"/>
+  <img src="graph&output&publication/feature_heatmap.png" alt="Feature Importance Heatmap" width="800"/>
   <p><em>Figure 14: Feature importance heatmap revealing distinct patterns across crime categories and geographic contexts</em></p>
 </div>
 
