@@ -12,13 +12,7 @@ The project develops and evaluates a general-purpose, multimodal spatio-temporal
 If you use this work in your research, please cite:
 
 ```bibtex
-@article{Guo2026GAIA,
-  title={Multimodal Spatio-Temporal Fusion: A Generalizable GCN-LSTM with Attention Framework for Urban Application},
-  author={Guo, Yunfei},
-  journal={Urban Computing and Applications},
-  year={2026},
-  doi={10.1234/example.doi},
-  orcid={0009-0002-1466-5807}
+@article{#undo
 }
 ```
 
