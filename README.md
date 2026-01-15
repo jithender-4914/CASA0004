@@ -114,6 +114,11 @@ The **4,835 Lower Layer Super Output Areas (LSOAs)** serve as fundamental spatia
 
 ## 🏗️ Framework Architecture
 
+<div align="center">
+  <img src="graph&output&publication/model_map.png" alt="Detailed Framework Architecture" width="900"/>
+  <p><em>Figure 3: Detailed architecture of the Spatio-Temporal Framework showing sequential processing Stages 0-4</em></p>
+</div>
+
 The model architecture is a **four-stage hybrid system** designed to systematically process and fuse spatial, temporal, and external feature information through multiple interconnected components, enabling generalization across diverse urban prediction tasks.
 
 ### Problem Formulation
@@ -162,6 +167,12 @@ Where:
 
 **2. Feature Fusion (Learnable Gating Mechanism)**
 Adaptively weights dynamic spatial signals against static external features:
+
+<div align="center">
+  <img src="graph&output&publication/Cross_Attention.png" alt="Cross-Attention Gating Mechanism" width="600"/>
+  <p><em>Figure 5: Cross-Attention Gating Mechanism adaptively fusing spatial and external features</em></p>
+</div>
+
 $$g_{t} = \text{sigmoid}(W_{g}[H_{GCN_{t}} || E_{ext}] + b_{g})$$
 
 Fused representation as weighted combination:
@@ -391,26 +402,26 @@ The integrated dataset comprises **15 static external features** spanning multip
 
 #### **Crime Data** (`ex1_crime/`)
 - **Source**: Metropolitan Police Service open data
-- **Temporal Coverage**: 2019-2023 (monthly)
+- **Temporal Coverage**: 2011-2023 (monthly)
 - **Categories**: Theft, Vehicle Offences, Violence Against Person
 - **Preprocessing**: Spatial aggregation to LSOA, outlier detection, missing value imputation
 
 #### **Housing Prices** (`ex2_housing/`)
 - **Source**: UK Land Registry, Rightmove, Zoopla
-- **Temporal Coverage**: 2019-2023 (quarterly)
+- **Temporal Coverage**: 1995-2023 (quarterly)
 - **Metric**: Median house prices per LSOA
 - **Preprocessing**: Price normalization, seasonal adjustment, market trend removal
 
 #### **Transport Footfall** (`ex3_transport/`)
 - **Source**: Transport for London (TfL)
-- **Temporal Coverage**: 2019-2023 (weekly)
+- **Temporal Coverage**: 2019-2025 (daily)
 - **Metric**: Entry/Exit tap counts per station
 - **Preprocessing**: Missing data imputation, spatial filtering, outlier removal
 
 ### 📁 Dataset Statistics
 
 - **Spatial Units**: 4,835 LSOAs / ~436 Stations
-- **Temporal Points**: 48 months (crime) / 16 quarters (housing) / 260 weeks (transport)
+- **Temporal Points**: 156 months (crime) / 116 quarters (housing) / 2,557 days (transport)
 - **Feature Dimensions**: 15 static + temporal targets
 
 ## ⚙️ Model Details
@@ -623,11 +634,11 @@ To validate generalizability, the framework was adapted to predict quarterly med
 
 #### **Cross-Domain Performance**
 
-| Model Variant | MAE (£) | RMSE (£) | R² | Improvement |
-|---------------|---------|----------|----| ------------|
-| Pure LSTM | 94,081 | 174,180 | 0.7557 | Baseline |
-| No External Adjacency | 82,781 | 165,915 | 0.7783 | 12.01% |
-| **Full Model** | **79,963** | **157,189** | **0.8010** | **15.01%** |
+| Model Variant | MAE (£) | RMSE (£) | MAPE | Improvement |
+|---------------|---------|----------|------|-------------|
+| Pure LSTM | 31,398 | 58,070 | 7.38% | Baseline |
+| No External Adjacency | 27,594 | 55,305 | 6.23% | 12.01% |
+| **Full Model** | **24,604** | **52,396** | **5.90%** | **15.01%** |
 
 **Key Insights:**
 - **Successful Adaptation**: Framework effectively captures spatial spillover effects in property markets
@@ -693,18 +704,18 @@ The framework provides actionable insights through attention-based feature impor
 </div>
 
 **Theft Predictions** - Transport-Centric Profile:
-- **MeanPTAL** (0.240): Highest importance - transport hubs concentrate victims and provide escape routes
-- **StationsWithin500m** (0.122): Reinforces transport accessibility theory
+- **MeanPTAL** (0.118): Highest importance - transport hubs concentrate victims and provide escape routes
+- **StationsWithin500m** (0.043): Reinforces transport accessibility theory
 - **Policy Implication**: Focus security resources on high-accessibility areas
 
 **Vehicle Offences** - Infrastructure-Centric Profile:
-- **StreetSegments** (0.088): Complex street networks provide more parking opportunities
-- **StreetLength_m** (0.085): Longer street networks correlate with vehicle density
+- **StreetSegments** (0.026): Complex street networks provide more parking opportunities
+- **StreetLength_m** (0.025): Longer street networks correlate with vehicle density
 - **Policy Implication**: Enhanced surveillance in areas with complex street layouts
 
 **Violence Against Person** - Socioeconomic-Centric Profile:
-- **MeanPTAL** (0.094): Transport accessibility remains important
-- **Education_HighLevel_pct** (0.069): Educational attainment inversely related to violence
+- **MeanPTAL** (0.029): Transport accessibility remains important
+- **Education_HighLevel_pct** (0.018): Educational attainment inversely related to violence
 - **Land Use Features**: Mixed land use creates interaction opportunities
 - **Policy Implication**: Multi-faceted interventions addressing social and environmental factors
 
