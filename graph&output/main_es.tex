@@ -1,0 +1,831 @@
+\documentclass[a4paper,fleqn]{cas-dc}
+
+% --- PACKAGES ---
+\usepackage[authoryear]{natbib}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{url}
+
+%%% --- Author definitions ---
+\def\tsc#1{\csdef{#1}{\textsc{\lowercase{#1}}\xspace}}
+\tsc{WGM}
+\tsc{QE}
+\tsc{EP}
+\tsc{PMS}
+\tsc{BEC}
+\tsc{DE}
+%%%
+
+\begin{document}
+\let\WriteBookmarks\relax
+\def\floatpagepagefraction{1}
+\def\textpagefraction{.001}
+
+% --- Short Title and Author for Headers ---
+\shorttitle{A Generalizable GCN-LSTM Framework for Urban Application}
+\shortauthors{Y. Guo}
+
+% --- Main Title ---
+\title [mode = title]{Multimodal Spatio-Temporal Fusion: A Generalizable GCN-LSTM with Attention Framework for Urban Application}
+
+% --- Author Information ---
+\author{Yunfei Guo}[orcid=0009-0002-1466-5807]
+\cormark[1]
+\ead{ucbvuoi@ucl.ac.uk}
+\affiliation{organization={Centre for Advanced Spatial Analysis, Bartlett Faculty of the Built Environment, University College London},
+    addressline={90 Tottenham Court Road}, 
+    city={London},
+    postcode={W1T 4TJ}, 
+    country={United Kingdom}}
+\cortext[cor1]{Corresponding author}
+
+% --- Abstract ---
+\begin{abstract}
+The proliferation of urban big data presents unprecedented opportunities for understanding cities, yet the analytical methods to harness this data are often fragmented and domain-specific. Existing predictive models in urban computing are typically highly specialized, creating analytical silos that inhibit knowledge transfer and are difficult to adapt across domains such as public safety, housing and transport. This paper confronts this critical gap by developing a generalizable, multimodal spatio-temporal deep learning framework engineered for both high predictive performance and interpretability, which is capable of mastering diverse urban prediction tasks without architectural modification. The hybrid architecture fuses a Multi-Head Graph Convolutional Network (GCN) for spatial diffusion, a Long Short-Term Memory (LSTM) network for temporal dynamics, and a learnable Gating Mechanism that weights the influence of spatial graph versus static external features. To validate this generalizability, the framework was tested on three distinct urban domains in London: crime forecasting, housing price estimation and transport network demand. The model outperformed traditional baselines (ARIMA, XGBoost) and state-of-the-art deep learning models (TabNet, TFT). Moreover, the framework moves beyond prediction to explanation by incorporating attention mechanisms and permutation feature importance analysis.
+\end{abstract}
+
+
+
+% --- Keywords ---
+\begin{keywords}
+Spatio-Temporal Forecasting \sep Graph Neural Networks \sep Urban Computing \sep Data Fusion \sep Deep Learning \sep Interpretability
+\end{keywords}
+
+\maketitle
+
+% --- SECTION 1: INTRODUCTION ---
+\section{Introduction}
+
+\subsection{Urban Data Complexity}
+Contemporary cities are complex, adaptive systems producing voluminous digital data from a highly diverse set of sources, a phenomenon commonly referred to as "urban big data" \citep{Zouetal2024}. This data, captured from traffic sensors, social media, administrative records, and mass transit systems, presents a rich, multi-perspective image of urban life. The key challenge of urban computing is to fuse these heterogeneous, spatio-temporal datasets to comprehend, model, and ultimately improve the urban space. The challenge is not merely one of volume but is fundamentally rooted in the multimodality, spatio-temporal dependence, and non-Euclidean nature intrinsic to the data itself. Relationships between urban phenomena are highly interdependent, the primary analytical challenge, therefore, is not to analyze individual data streams in isolation but to model the complex interactions between them.
+
+The limitations of conventional models have spurred the adoption of advanced deep learning techniques \citep{Jinetal2025}. While traditional statistical methods like ARIMA \citep{BoxJenkins1976} and robust ensemble algorithms such as XGBoost \citep{ChenGuestrin2016} remain popular, they often struggle to capture high-dimensional spatio-temporal dependencies.
+Yet, even recent advancements in deep tabular learning, such as TabNet \citep{ArikPfister2021} and Temporal Fusion Transformers \citep{Limetal2021}, have achieved state-of-the-art results in time-series forecasting but lack explicit mechanisms to model non-Euclidean spatial graphs, possessing structural shortcomings for urban analysis.
+
+\begin{figure}[pos=h]
+	\centering
+	\includegraphics[width=\linewidth]{Graph Convolutional Network (Kipf and Welling, 2017)..png}
+	\caption{Conceptual Diagram of a Graph Convolutional Network. The model aggregates feature representations from immediate neighbours (orange nodes) to update the central node, mimicking spatial diffusion. (Source: Adapted from \citet{KipfWelling2017})}
+	\label{fig:gcn_concept}
+\end{figure}
+
+\subsection{Spatial Graph Construction} 
+The structure of urban systems is more accurately represented by irregular spatial graphs of road networks, administrative zones, or public transport lines \citep{Bronsteinetal2017}. This realization has catalyzed a paradigm shift towards geometric deep learning, a field dedicated to generalizing neural networks for non-Euclidean data. Graph Neural Networks (GNNs), a cornerstone of this field, have emerged as exceptionally powerful tools for urban science. 
+
+By representing city elements (e.g., neighbourhoods) as nodes and their relationships (e.g., proximity) as edges, GNNs can explicitly model the spatial interdependencies and spillover effects that define urban dynamics. The foundational work on Graph Convolutional Networks (GCNs) by \citet{KipfWelling2017} established a scalable "message-passing" mechanism, whereby nodes iteratively aggregate information from their local neighbourhoods, as illustrated in Figure \ref{fig:gcn_concept}. This allows each node to learn an embedding that encodes both its own features and its spatial context.
+
+While the combination of GNNs for spatial modeling and sequence models like Long Short-Term Memory (LSTM) for temporal analysis-often referred to as Spatio-Temporal Graph Neural Networks (STGNNs)—has become state-of-the-art, a significant structural problem persists.
+
+\subsection{The Silo Problem.}
+ As highlighted in recent surveys, the vast majority of research has occurred in domain-specific silos. Crime prediction experts develop models tailored to crime data, transport researchers build custom frameworks for traffic, and housing economists design bespoke models for real estate. A comprehensive survey by \citet{AlSahili2023} noted that fewer than 5\% of the STGNN variants reviewed were evaluated on more than one type of urban prediction task. This fragmentation leads to a constant "reinvention of the wheel" and limits the transferability of knowledge, preventing insights from one domain from benefiting another. There is, therefore, a pressing need for a unifying, "general-purpose" framework—a single, adaptable modeling architecture capable of handling a range of urban prediction tasks with minimal modification. This paper directly addresses this research gap by detailing the development, implementation, and evaluation of a generalizable and interpretable deep learning framework for multimodal spatio-temporal prediction, outlined in Figure \ref{fig:research_flow}.
+
+\begin{figure*}[pos=h]
+    \centering
+    \includegraphics[width=\linewidth]{work flow_new.png} 
+    \caption{Overview of the Research Workflow. The study progresses from multimodal data acquisition and fusion to architectural design, and finally to cross-domain evaluation and interpretation.}
+    \label{fig:research_flow}
+\end{figure*}
+
+\subsection{Research Contributions.}
+
+The research makes three principal contributions:
+\begin{enumerate}
+    \item \textbf{Methodological:} The design and implementation of a novel, hybrid GCN-LSTM-Attention framework engineered specifically for generalizability, integrating spatial, temporal, and multimodal data streams within a single, coherent architecture.
+    \item \textbf{Empirical:} The first cross-domain validation of such a framework, providing quantitative evidence against the prevailing task-specific paradigm by demonstrating superior performance on crime forecasting, housing price estimation and transport network demand.
+    \item \textbf{Practical:} The demonstration of actionable interpretability through feature importance analysis, bridging the critical gap between high-performance predictive modeling and the generation of policy insights.
+\end{enumerate}
+
+The remainder of this paper is structured as follows. Section 2 reviews related work in spatio-temporal deep learning and its urban applications. Section 3 presents the technical architecture of the proposed framework. Section 4 details the experimental design, including data, baselines, and evaluation metrics. Section 5 presents and analyzes the results from the two case studies. Section 6 discusses the broader implications and limitations of the findings, and Section 7 concludes the paper.
+
+% --- SECTION 2: RELATED WORK ---
+\section{Related Work}
+
+\subsection{Spatio-Temporal Graph Neural Networks}
+Effectively learning from spatio-temporal data is crucial for urban management \citep{Zouetal2024}. Traditional models often failed to capture the complex spatial correlations and temporal dynamics inherent in urban processes \citep{Zhangetal2021}. The rise of GNNs enabled learning on complex, non-Euclidean topologies \citep{Bronsteinetal2017, Hamiltonetal2017}. To address the dual nature of urban data, researchers began integrating GNNs with temporal models like LSTMs, creating STGNNs. These architectures integrate graph-based propagation for spatial learning with sequence modeling for temporal learning, capturing both where and when events occur \citep{Chenetal2025}. 
+
+\begin{figure}[pos=h]
+	\centering
+	\includegraphics[width=\linewidth]{DCRNN.png}
+	\caption{Architecture of the Diffusion Convolutional Recurrent Neural Network (DCRNN). An encoder, consisting of recurrent units with embedded graph convolutions, processes the input sequence. Its final state is passed to a decoder that generates the future sequence one step at a time. (Source: \citet{Lietal2018})}
+	\label{fig:dcrnn}
+\end{figure}
+
+Early influential works include the Diffusion Convolutional Recurrent Neural Network (DCRNN) by \citet{Lietal2018}, which combines graph convolutions with a recurrent encoder-decoder structure (Figure \ref{fig:dcrnn}). Attention mechanisms were later incorporated to allow models to focus on critical time steps or influential regions, further improving performance \citep{Vaswanietal2017, Velickovicetal2018}. The Attention-Based Spatio-Temporal GCN (ASTGCN) by \citet{Guoetal2019} exemplifies this, using both spatial and temporal attention to achieve state-of-the-art results in traffic forecasting (Figure \ref{fig:astgcn}). This general template of GCN + temporal sequence model + attention has become a flexible and powerful paradigm for urban forecasting (Al Sahili,2023).
+
+\begin{figure}[pos=h]
+	\centering
+	\includegraphics[width=\linewidth]{ASTGCN (Guo et al. 2019).png}
+	\caption{Architecture of the Attention-Based Spatio-Temporal GCN (ASTGCN). The model processes recent, daily, and weekly time-series components separately. Within each component, spatial and temporal attention blocks are applied, and their outputs are fused for a final prediction. (Source: \citet{Guoetal2019})}
+	\label{fig:astgcn}
+\end{figure}
+
+\subsection{Applications in Urban Domains}
+STGNNs have been successfully applied across various urban domains. For instance, recent models effectively fuse multimodal data for complex tasks like urban land use classification \citep{Renetal2024}. In crime prediction, graph-enhanced models learn spatial dependencies between regions to map predictive hotspots, outperforming non-graph models by explicitly modeling neighbourhood interactions and the influence of local features \citep{Shanetal2025, ZhangCheng2020}. 
+For housing price estimation, GNNs capture spatial spillover effects, where prices in one area influence adjacent ones. By representing neighbourhoods as nodes in a graph, these models consistently outperform traditional hedonic models that assume spatial independence \citep{Karamanouetal2024, Lietal2025}. In transportation, STGNNs are state-of-the-art for traffic flow prediction, modeling traffic as a diffusion process over the road network graph \citep{Chenetal2025, Lietal2018}. More recently, they have been combined with reinforcement learning to optimize transit network design for improved accessibility \citep{Holliday2025}. In sentiment mapping, while GNNs are less common, recent work has demonstrated the power of fusing multimodal data. For example, \citet{AmanMatisziw2025} combined language models (BERT) for text sentiment and vision models for street-view imagery to create rich, spatialized maps of public sentiment, showing strong correlations between the built environment and public attitude.
+
+\subsection{Challenges in Multimodal Data Fusion}
+Integrating data from diverse urban sources is inherently challenging. A comprehensive survey by \citet{Zouetal2024} provides a taxonomy for cross-domain data fusion in urban computing, identifying feature-level fusion, alignment-based methods, and contrastive learning as key approaches. Urban datasets are heterogeneous in format, scope, and quality, and operate at different spatial and temporal resolutions. Misalignment can introduce significant noise, and simply concatenating features is often suboptimal. Models must account for contextual relationships and data heterogeneity. Attention-based fusion mechanisms that dynamically weight different data sources have emerged as a promising solution \citep{Guoetal2019}. The need for a flexible framework that can flexibly incorporate various data types and provide clarity on their respective roles is a central motivation for this work.
+
+% --- SECTION 3: FRAMEWORK ---
+\section{A Generalizable Framework}
+This section details the technical architecture of the proposed hybrid GCN-LSTM-Attention framework, which is engineered for both predictive power and generalizability across different urban prediction tasks.
+
+\subsection{Problem Formulation}
+The task is defined as a sequence-to-value problem on a graph.
+\subsubsection{Graph Definition}
+Let the urban environment be represented by an undirected graph $G=(V, E)$, where $V = \{v_1, v_2, ..., v_N\}$ is the set of $N$ spatial units (LSOAs). The topological structure of the city is encoded in the adjacency matrix $A \in \mathbb{R}^{N \times N}$. In this study, $A$ is constructed based on first-order Queen contiguity, defined as:
+\begin{equation}
+A_{ij} = 
+\begin{cases} 
+1 & \text{if } \text{region } i \text{ and } j \text{ share a common boundary,} \\
+0 & \text{otherwise.}
+\end{cases}
+\end{equation}
+
+\subsubsection{Spatio-Temporal Inputs}
+The problem is formulated as a sequence-to-value forecasting task. The model relies on two distinct feature sets:
+\begin{enumerate}
+    \item \textbf{Dynamic Temporal Features ($X_{temp}$):} A tensor $X_{temp} \in \mathbb{R}^{B \times T \times N \times 1}$ representing the historical time-series of the target variable over window length $T$, where $B$ is the batch size.
+    \item \textbf{Static External Features ($X_{ext}$):} A matrix $X_{ext} \in \mathbb{R}^{N \times F}$ encoding the characteristics of each node, where $F$ is the feature dimensionality.
+\end{enumerate}
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{model_map.png}
+    \caption{Detailed Architecture of the Spatio-Temporal Framework. This diagram illustrates the flow of data through the model, from raw external features and temporal sequences on the bottom, through the embedding and spatio-temporal fusion stages, to the final prediction head on the top.}
+    \label{fig:framework_arch}
+\end{figure*}
+
+\subsubsection{Learning Objective}
+The objective is to learn a mapping function $f(\cdot)$ that fuses the spatial graph structure with temporal and static features to predict the target value for the next time step $T+1$:
+\begin{equation}
+\hat{Y}_{T+1} = f(X_{temp}, X_{ext}, G)
+\end{equation}
+where $\hat{Y}_{T+1} \in \mathbb{R}^{B \times N}$ denotes the predicted values across all spatial nodes.
+
+\subsection{Framework Architecture}
+The model follows a four-stage structure designed to systematically process and fuse spatial, temporal, and external feature information, as depicted in Figure \ref{fig:framework_arch}.
+
+\subsubsection{Stage 1 \& 2: Input Embeddings}
+Raw urban data is highly heterogeneous. To handle this issue, the framework projects inputs into a unified high-dimensional latent space ($D_{emb} = 64$).
+\paragraph{1. Temporal Embedding}
+The raw dynamic temporal features are passed through a linear layer to the latent dimension:
+\begin{equation}
+E_{temp_t} = Linear(X_{temp_t}) \in \mathbb{R}^{B \times N \times D_{emb}}
+\end{equation}
+\paragraph{2. External Embedding}
+The static external features for each node are processed by a Multi-Layer Perceptron (MLP) to learn a non-linear representation:
+\begin{equation}
+E_{ext} = MLP(X_{ext}) \in \mathbb{R}^{N \times D_{emb}}
+\end{equation}
+This stage aligns the semantic space of the dynamic and static features, facilitating the fusion operations in the following stages.
+
+\subsubsection{Stage 3: Spatio-Temporal Fusion Block}
+This stage is the model's core, consisting of a recurrent block that iterates through the time sequence $t=1, \dots, T$ to perform three key operations at each step:
+
+\paragraph{1. Spatial Dependency (Multi-Head GCN)}
+A Multi-Head Graph Convolutional Network captures spatial patterns. For each head $k$, a graph convolution is applied to the temporal embedding $E_{temp_{t}}$. The multi-head mechanism enables the model to capture different types of spatial relationships simultaneously.
+\begin{equation}
+H_{GCN_{t}}^{(k)} = \sigma(\hat{D}^{-\frac{1}{2}}\hat{A}\hat{D}^{-\frac{1}{2}}E_{temp_{t}}W_{k})
+\end{equation}
+where $\hat{A}=A+I$ is the adjacency matrix with self-loops, $\hat{D}$ is the corresponding degree matrix, the symmetric normalization $\hat{D}^{-\frac{1}{2}}\hat{A}\hat{D}^{-\frac{1}{2}}$ ensures numerical stability. $W_{k}$ is the weight matrix for head $k$, and $\sigma$ is a ReLU activation function. The outputs of all heads are then concatenated.
+
+\paragraph{2. Feature Fusion (Gating Mechanism)}
+The spatially-aware representation $H_{GCN_{t}}$ is fused with the static external feature embedding $E_{ext}$ using a learnable gating mechanism, detailed in Figure \ref{fig:gating}.
+\begin{equation}
+g_{t} = \text{sigmoid}(W_{g}[H_{GCN_{t}} || E_{ext}] + b_{g})
+\end{equation}
+
+The final fused representation $F_t$ is a weighted combination.
+\begin{equation}
+F_{t} = g_{t} \odot H_{GCN_{t}} + (1-g_{t}) \odot E_{ext}
+\end{equation}
+where $||$ denotes concatenation, $W_{g}$ and $b_{g}$ are learnable parameters, and $\odot$ is the element-wise product. The resulting fused representation is $F_{t} \in \mathbb{R}^{B \times N \times D_{emb}}$.
+
+This allows the model to adaptively shift focus between dynamic spatial signals and static external features.
+
+\begin{figure}[pos=h]
+    \centering
+    \includegraphics[width=\linewidth]{Cross_Attention.png}
+    \caption{The Cross-Attention and Gating Mechanism for Feature Fusion. The model learns to weigh the importance of dynamic graph features and static external features before they are passed to the recurrent unit.}
+    \label{fig:gating}
+\end{figure}
+
+\paragraph{3. Temporal Dependency (LSTM)}
+The fused representation $F_{t}$ is passed to an LSTM cell to update the hidden state $h_{t}$.
+\begin{equation}
+h_{t} = \text{LSTM}(F_{t}, h_{t-1})
+\end{equation}
+where $h_{t-1}$ is the hidden state from the previous time step.
+
+This allows the model to retain relevant historical trends while forgetting irrelevant noise. 
+
+\subsubsection{Stage 4: Temporal Aggregation and Prediction}
+The output of the previous stage is a sequence of hidden states $(h_1,..., h_T)$. To generate a single prediction for $T+1$, the hidden states are aggregated.
+
+\paragraph{1. Positional Encoding}
+A sinusoidal positional encoding vector, $PE(t)$, is added to each hidden state $h_{t}$ to inject information about timing, resulting in $h'_{t} = h_{t} + PE(t)$.
+\begin{align}
+PE_{pos,2i} &= \sin(pos/10000^{2i/D_{emb}}) \\
+PE_{pos,2i+1} &= \cos(pos/10000^{2i/D_{emb}})
+\end{align}
+
+\paragraph{2. Temporal Attention}
+An attention mechanism is applied to the sequence of hidden states $(h'_{1}, \dots, h'_{T})$ to assign more weight to relevant time steps.
+\begin{align}
+e_{t} &= v^{T}\tanh(W_{h}h'_{t} + b_{h}) \\
+\alpha_{t} &= \frac{\exp(e_{t})}{\sum_{j=1}^{T}\exp(e_{j})} \\
+c &= \sum_{t=1}^{T}\alpha_{t}h'_{t}
+\end{align}
+Here, $v$, $W_{h}$, and $b_{h}$ are learnable attention parameters, $\alpha_{t}$ are the normalized attention weights, and $c$ is the final context vector.
+
+The attention weights $\alpha_t$ allow the model to focus on specific historical events that are highly correlated with the target variable.
+
+
+\paragraph{3. Prediction Head}
+The context vector $c$ is passed through a final MLP to generate the prediction $\hat{Y}$.
+\begin{equation}
+\hat{Y} = \text{MLP}(c)
+\end{equation}
+This modular design allows the final output layer to be easily adapted to different prediction tasks without altering the core architecture.
+
+% --- SECTION 4: EXPERIMENTAL DESIGN ---
+\section{Experimental Design}
+
+To test the generalizability of the framework, an extensive study was conducted across three distinct urban tasks: Crime Forecasting, Housing Price Estimation, and Transport Network Demand.
+
+\subsection{Data and Study Area}
+Greater London was selected as the case study, serving as an archetypal complex urban system with a mature open data ecosystem. The fundamental spatial unit for analysis was the Lower Layer Super Output Area (LSOA) from the 2011 Census. Figure \ref{fig:london_map} depicts the study area.
+
+\begin{figure}[pos=h]
+    \centering
+    \includegraphics[width=\linewidth]{Map of the London Study Area.png}
+    \caption{Map of the London Study Area. This figure depicts the LSOA boundaries of Greater London, overlaid with key transport networks.}
+    \label{fig:london_map}
+\end{figure}
+
+A core component of this research was a principled data fusion pipeline (Figure \ref{fig:pipeline}) to integrate heterogeneous data into a single, model-ready feature matrix. The pipeline processed five main categories of data: geographic, transport, demographic, sentiment, and the target variables.
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\linewidth]{data_pre.png}
+    \caption{The Multimodal Data Preprocessing Pipeline. This diagram shows the end-to-end workflow, from raw data sources on the left to the final standardized feature matrix on the right.}
+    \label{fig:pipeline}
+\end{figure*}
+
+A list of the 15 static external features (Figure \ref{fig:correlation_heatmap}) and the three target variables used is provided in Table \ref{tab:datasets}.
+
+\begin{figure}[pos=h]
+    \centering
+    \includegraphics[width=\linewidth]{Feature Correlation Heatmap.png}
+    \caption{Feature Correlation Heatmap. This heatmap shows the Pearson correlation coefficients between the 15 external features.}
+    \label{fig:correlation_heatmap}
+\end{figure}
+
+\begin{table*}[h]
+\caption{Dataset Specifications and Sources. All data were processed and aligned to the LSOA spatial unit.}
+\label{tab:datasets}
+\centering
+\begin{tabular}{llll}
+\toprule
+Category & Feature Name & Description & Source \\
+\midrule
+\multicolumn{4}{l}{\textbf{Static External Features ($X_{ext}$)}} \\
+Demographic & Education\_HighLevel\_pct & Percentage of population with higher education. & 2011 UK Census \\
+ & Population & Total residential population of the LSOA. & 2011 UK Census \\
+Geographic & Area\_km2 & Total geographic area of the LSOA in $km^2$. & ONS \\
+ & LandUse\_Area & Total area for specific land uses within the LSOA. & ONS/OSM \\
+ & LandUse\_Diversity & Metric measuring the variety of land uses. & ONS/OSM \\
+Transport & MeanPTAL & Mean Public Transport Accessibility Level score. & TfL \\
+ & NearestStation\_m & Distance (m) to the nearest Tube or Rail station. & TfL/OSM \\
+ & StationsWithin500m & Count of stations within a 500m radius. & TfL/OSM \\
+ & NearestRail\_m & Distance (m) to the nearest National Rail station. & TfL/OSM \\
+Street Network & StreetLength\_m & Total length of all street segments (m). & OSM \\
+ & StreetDensity\_m\_per\_m2 & Street length divided by LSOA area. & OSM \\
+ & StreetSegments & Total number of individual street segments. & OSM \\
+Sentiment & MeanSentiment & Average sentiment score from public venue reviews. & Google API \\
+ & SentimentSD & Standard deviation of sentiment scores. & Google API \\
+ & ReviewCount & Total number of public reviews collected. & Google API \\
+\midrule
+\multicolumn{4}{l}{\textbf{Target Variables (Time-Series)}} \\
+Task 1: Crime & Theft; Vehicle; Violence & Monthly counts (Jan 2011 - Dec 2023). & London Datastore \\
+Task 2: Housing & Median House Price (£) & Quarterly median price (Q1 1995 - Q4 2023). & UK Land Registry \\
+Task 3: Transport & Network Demand (k-Taps) & Aggregated daily passenger volume (Jan 2019 - Dec 2025). & TfL Open Data \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Implementation Details}
+To test the framework's performance and generalizability, an ablation study was conducted on three distinct tasks: (1)Crime Forecasting; (2)Housing Price Estimation; (3)Transport Network Demand.
+
+\subsubsection{Baselines and Ablations}
+The performance of the full model was compared against architectural ablations and several industry baselines:
+\begin{itemize}
+    \item \textbf{ARIMA:} Standard statistical baseline for univariate time-series forecasting.
+    \item \textbf{XGBoost:} A scalable tree boosting system widely used for structured data.
+    \item \textbf{Temporal Fusion Transformer (TFT):} An attention-based deep learning model designed for multi-horizon forecasting.
+    \item \textbf{TabNet:} A deep tabular learning architecture using sequential attention.
+    \item \textbf{Pure LSTM:} A baseline using only the LSTM component to process historical time-series, ignoring external features and spatial information.
+    \item \textbf{No External Adjacency:} Includes static external features but removes the GCN's message-passing component.
+\end{itemize}
+
+\subsubsection{Evaluation Metrics}
+To ensure a rigorous assessment of model performance, a suite of metrics was selected. Each metric captures a different aspect of the error distribution. $n$ is the number of samples, $y_{i}$ is the true value, $\hat{y}_{i}$ is the predicted value, and $\bar{y}$ is the mean of the true values. $\epsilon$ ($1e^{-5}$) was added to the denominator of MAPE to handle the zero ground truth.
+
+Mean Absolute Error (MAE) measures the average magnitude of errors in the same units as the target variable, offering the most direct interpretation of model utility.
+
+\begin{equation}
+\text{MAE} = \frac{1}{n}\sum_{i=1}^{n}|y_{i}-\hat{y}_{i}|
+\end{equation}
+
+
+Root Mean Squared Error (RMSE) represents the standard deviation of the prediction errors, which specifically penalize large errors. 
+\begin{equation}
+\text{RMSE} = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}}
+\end{equation}
+
+Mean Absolute Percentage Error (MAPE) provides a relative measure of error, facilitating comparisons across tasks with different scales
+\begin{equation}
+\text{MAPE} = \frac{1}{n}\sum_{i=1}^{n}\left|\frac{y_{i}-\hat{y}_{i}}{y_{i} + \epsilon}\right| \times 100\%
+\end{equation}
+
+\subsubsection{Feature Importance}
+To quantify the contribution of individual multimodal features, permutation feature importance analysis was conducted. While the framework utilizes Mean Squared Error (MSE) during training to effectively penalize outliers, the importance evaluation is conducted using Mean Absolute Error (MAE) to enhance interpretability. The importance score $I_f$ for a feature $f$ is defined as the increase in predictive error when that feature is randomly permuted:
+\begin{equation}
+I_f = \text{MAE}_{permuted}^{(f)} - \text{MAE}_{baseline}
+\end{equation}
+A higher $I_f$ indicates that the feature is more critical for maintaining model accuracy.
+
+
+% --- SECTION 5: RESULTS ---
+\section{Results and Analysis}
+
+This section presents the results of experiments, analyzing the model performance across the three domains.
+
+\subsection{Case Study I: Crime Forecasting}
+
+The first case study assessed the framework's capacity to forecast monthly counts for three distinct crime categories: Theft, Violence Against the Person, and Vehicle Offences. As illustrated in Figure \ref{fig:crime_trends}, these categories exhibit highly non-stationary temporal behaviors.
+
+\begin{figure}[pos=h]
+    \centering
+    \includegraphics[width=\linewidth]{Crime Trends in London Over Time by Category.png}
+    \caption{Crime Trends in London Over Time by Category. This time-series plot shows the monthly counts for the three target crime categories, highlighting the non-stationary nature of the data.}
+    \label{fig:crime_trends}
+\end{figure}
+
+\subsubsection{Quantitative Performance}
+Table \ref{tab:crime_results} summarizes the performance of the proposed framework against the baselines and ablation test. The Full Model achieved the lowest errors across all metrics and categories.
+
+For the high-volume Theft category, the Full Model recorded a Mean Absolute Error (MAE) of 1.6071, reducing the MAE by 34.15\% compared to the Pure LSTM baseline (MAE 2.4406) and by 17.67\% compared to the No External Adjacency ablation (MAE 1.9520).
+
+For Violence and Vehicle Offences, the Full Model similarly outperformed the baselines, achieving MAEs of 1.7323 and 1.1341. Notably, the XGBoost and TabNet baselines performed competitively but failed to surpass the Full Model.
+
+\begin{table}[h]
+\caption{Performance Comparison for Crime Prediction.}
+\label{tab:crime_results}
+\centering
+\begin{tabular}{lllll}
+\toprule
+Category & Model & MAE & RMSE & MAPE \\
+\midrule
+\multirow{9}{*}{\textbf{Theft}} & \multicolumn{4}{l}{\textit{Baseline}} \\
+ & ARIMA & 2.2652 & 10.9612 & 12.36\% \\
+ & XGBoost & 2.2457 & 12.2009 & 12.26\% \\
+ & TFT & 2.2543 & 7.6506 & 11.72\% \\
+ & TabNet & 2.1483 & 8.3230 & 11.73\% \\
+ & \multicolumn{4}{l}{\textit{Ablation}} \\
+ & Pure LSTM & 2.4406 & 16.9048 & 13.33\% \\
+ & No Ext. Adj. & 1.9520 & 5.6106 & 10.28\% \\
+ & \textbf{Full Model} & \textbf{1.6071} & \textbf{4.3326} & \textbf{9.79\%} \\
+\midrule
+\multirow{9}{*}{\textbf{Violence}} & \multicolumn{4}{l}{\textit{Baseline}} \\
+ & ARIMA & 1.8516 & 2.6225 & 11.82\% \\
+ & XGBoost & 1.9546 & 2.6734 & 12.48\% \\
+ & TFT & 2.0715 & 2.9223 & 12.88\% \\
+ & TabNet & 1.9373 & 2.6830 & 12.37\% \\
+ & \multicolumn{4}{l}{\textit{Ablation}} \\
+ & Pure LSTM & 1.9736 & 3.3164 & 14.95\% \\
+ & No Ext. Adj. & 1.8789 & 2.6191 & 12.03\% \\
+ & \textbf{Full Model} & \textbf{1.7323} & \textbf{2.5126} & \textbf{10.24\%} \\
+\midrule
+\multirow{9}{*}{\textbf{Vehicle}} & \multicolumn{4}{l}{\textit{Baseline}} \\
+ & ARIMA & 1.1851 & 1.7230 & 17.70\% \\
+ & XGBoost & 1.1679 & 1.6435 & 17.45\% \\
+ & TFT & 1.2450 & 1.8286 & 22.05\% \\
+ & TabNet & 1.1373 & 1.6141 & 16.99\% \\
+ & \multicolumn{4}{l}{\textit{Ablation}} \\
+ & Pure LSTM & 1.1565 & 1.6527 & 17.62\% \\
+ & No Ext. Adj. & 1.1404 & 1.5753 & 15.33\% \\
+ & \textbf{Full Model} & \textbf{1.1341} & \textbf{1.5272} & \textbf{13.83\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Qualitative Analysis}
+To validate the statistical metrics, the alignment between predicted and actual values was tested. Figure \ref{fig:theft_scatter} presents the scatter plot for the Theft category. The model demonstrates a high degree of precision ($R^2 = 0.910$), with actual data points clustering closely around the ideal prediction regression line.
+
+\begin{figure}[pos=h]
+    \centering
+    \includegraphics[width=\linewidth]{Time-Series Plot of Actual vs. Predicted Theft Counts.png}
+    \caption{Model Performance for Crime Prediction (Predicted vs. Actual Values - Theft). The scatter plot confirms a strong linear relationship between predictions and actual counts.}
+    \label{fig:theft_scatter}
+\end{figure}
+
+The advantage of the GCN-LSTM architecture over a standard recurrent model is further visualized in the time-series comparison in Figure \ref{fig:theft_timeseries}. The plots display prediction traces for randomly selected regions across the three crime categories. 
+
+The GCN-LSTM consistently tracks the ground truth values more accurately than the Pure LSTM. In the time step that crime counts exhibit sharp changes, the Pure LSTM tends to be unstable, whereas the GCN-LSTM captures the inflection points effectively.
+
+\begin{figure}[pos=h]
+    \centering
+    \includegraphics[width=\linewidth]{crime_prediction_line.png}
+    \caption{Simulated Crime Prediction Comparison. The GCN-LSTM (blue) tracks actual trends (black) significantly better than the Pure LSTM baseline (red).}
+    \label{fig:theft_timeseries}
+\end{figure}
+
+\subsubsection{Interpretability Results}
+Beyond accuracy, the framework provides transparency through feature importance analysis. Figure \ref{fig:crime_feature_importance_heatmap} displays the permutation importance scores, quantifying the impact of each feature on the MAE.
+
+\begin{figure}[pos=h]
+    \centering
+    \includegraphics[width=\linewidth]{feature_heatmap.png}
+    \caption{Feature Permutation Importances by Crime Type. The heatmap visualizes the increase in Mean Absolute Error (MAE) when a specific feature is permuted. Darker color indicates higher importance. The negative values were set to zero as irrelevant indicator.}
+    \label{fig:crime_feature_importance_heatmap}
+\end{figure}
+
+The analysis reveals distinct natures for each crime type. Theft is most strongly influenced by MeanPTAL, with an importance score of 0.118, followed by StationsWithin500m (0.043). This suggests that transport connectivity is the dominant predictor for theft counts among the 15 static external features. Conversely, Vehicle Offences and Violence show different dependency patterns, but lower sensitivity to the static features.
+
+\subsection{Case Study II: Housing Price Estimation}
+
+To validate the framework's generalizability, the model was applied to the economic domain of predicting quarterly median house prices. The model proved effective as shown in Table \ref{tab:housing_results}.
+
+In terms of MAE, the Full Model (£24,604) actually trailed the TabNet baseline, which achieved the best accuracy of £23,091. However, the Full Model did achieve the best performance in RMSE and MAPE. This result indicates that the TabNet was slightly more accurate on average for typical samples, but the Full Model was more robust against large error outliers and performed better in relative terms.
+
+Additionally, the component analysis confirms the value on both spatial graph structure and external features with overall 15.01\% improvement. It also reveals that this task is feature-dominant, with static external features providing a 12.01\% improvement over baselines and a 3.40\% gain from the spatial graph structure.
+
+\begin{figure}[pos=h]
+    \centering
+    \includegraphics[width=\linewidth]{housing_price.png}
+    \caption{London House Price Trends Over Time. This plot illustrates the quarterly median house price in London.}
+    \label{fig:housing_trends}
+\end{figure}
+
+\begin{table}[h]
+\caption{Performance Comparison for Housing Price Prediction.}
+\label{tab:housing_results}
+\centering
+\begin{tabular}{lllll}
+\toprule
+Category & Model & MAE & RMSE & MAPE \\
+\midrule
+\multirow{9}{*}{\textbf{Housing Price}} & \multicolumn{4}{l}{\textit{Baseline}} \\
+ & ARIMA & 39,527 & 54,249 & 8.98\% \\
+ & TFT & 36,138 & 71,028 & 10.06\% \\
+ & XGBoost & 25,629 & 88,133 & 6.29\% \\
+ & TabNet & 23,091 & 52,417 & 6.64\% \\
+ & \multicolumn{4}{l}{\textit{Ablation}} \\
+ & Pure LSTM & 31,398 & 58,070 & 7.38\% \\
+ & No Ext. Adj. & 27,594 & 55,305 & 6.23\% \\
+ & \textbf{Full Model} & \textbf{24,604} & \textbf{52,396} & \textbf{5.90\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Case Study III: Transport Network Demand}
+To further validate performance on transport network demand (Figure \ref{fig:transport_results}), the model was also applied to transport demand forecasting.
+
+\begin{figure}[pos=h]
+    \centering
+    \includegraphics[width=\linewidth]{footfall_trends.png}
+    \caption{Transport Network Traffic Trends. This plot illustrates the aggregate daily network traffic by passenger volume.}
+    \label{fig:transport_results}
+\end{figure}
+
+The testing result in Table \ref{tab:transport_results} demonstrates the Full Model achieved the best in all three evaluation metrics. Meanwhile, the spatial graph provides a 37.51\% improvement, which is the highest spatial contribution across all other four prediction tasks, reflecting the network-driven nature of traffic diffusion. Theft shows a balanced profile, benefitting equally from both components.
+
+\begin{table}[h]
+\caption{Performance Comparison for Transport Network Demand.}
+\label{tab:transport_results}
+\centering
+\begin{tabular}{lllll}
+\toprule
+Category & Model & MAE & RMSE & MAPE \\
+\midrule
+\multirow{9}{*}{\textbf{Transport Flow}} & \multicolumn{4}{l}{\textit{Baseline}} \\
+ & ARIMA & 4.7754 & 9.2750 & 74.89\% \\
+ & XGBoost & 1.8586 & 4.4154 & 14.78\% \\
+ & TFT & 1.6035 & 3.7502 & 11.44\% \\
+ & TabNet & 1.5706 & 3.6069 & 14.86\% \\
+ & \multicolumn{4}{l}{\textit{Ablation}} \\
+ & Pure LSTM & 2.7478 & 6.6010 & 13.46\% \\
+ & No Ext. Adj. & 1.7171 & 3.9373 & 13.68\% \\
+ & \textbf{Full Model} & \textbf{1.4138} & \textbf{3.3166} & \textbf{10.87\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% --- SECTION 6: DISCUSSION ---
+\section{Discussion}
+
+\subsection{Framework Generalizability}
+The empirical success of the framework in the three cross-domain tasks provides a strong vindication for the general purpose framework. By consistently outperforming baselines, the framework demonstrates that its capacity of modelling the heterogeneity of urban systems. Specifically, the model has the adaptive capacity to handle the distinct structural properties of different urban phenomena by shifting its reliance between spatial diffusion, temporal sequences and external features based on the task at hand.
+
+\subsection{Comparative Analysis against Baselines}
+The performance was evaluated against three classes of baselines: traditional statistical methods (ARIMA), machine learning ensembles (XGBoost), and deep learning architectures (TFT, TabNet). The result consistently shows high performance, particularly in tasks with high spatio-temporal volatility as shown in Table \ref{tab:baseline_improvement_full}.
+
+\begin{table*}[pos=h]
+\centering
+\caption{Relative Performance Improvement against Baselines.}
+\label{tab:baseline_improvement_full}
+\begin{tabular}{llrrrr}
+\toprule
+\textbf{Task} & \textbf{Metric} & \textbf{vs. ARIMA} & \textbf{vs. XGBoost} & \textbf{vs. TFT} & \textbf{vs. TabNet} \\
+\midrule
+\multirow{2}{*}{Theft} 
+ & MAE & +29.05\% & +28.44\% & +28.71\% & +25.19\% \\
+ & RMSE & +60.47\% & +64.49\% & +43.37\% & +47.94\% \\
+\cmidrule{2-6}
+\multirow{2}{*}{Violence} 
+ & MAE & +6.44\% & +11.37\% & +16.37\% & +10.58\% \\
+ & RMSE & +4.19\% & +6.01\% & +14.02\% & +6.35\% \\
+\cmidrule{2-6}
+\multirow{2}{*}{Vehicle Offences} 
+ & MAE & +4.30\% & +2.89\% & +8.91\% & +0.28\% \\
+ & RMSE & +11.36\% & +7.08\% & +16.48\% & +5.38\% \\
+\midrule
+\multirow{2}{*}{\shortstack[l]{Housing Prices}}
+ & MAE & +37.75\% & +4.00\% & +31.92\% & -6.55\% \\
+ & RMSE & +3.42\% & +40.55\% & +26.23\% & +0.04\% \\
+\midrule
+\multirow{2}{*}{\shortstack[l]{Transport Demand}} 
+ & MAE & +70.39\% & +23.93\% & +11.83\% & +9.98\% \\
+ & RMSE & +64.24\% & +24.89\% & +11.56\% & +8.05\% \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Univariate modeling limitations were evident in the contrast between tasks. Particularly for the Theft and Transport Demand, where the Full Model reduced error by 29.05\% and 70.39\% in MAE, 60.47\% and 64.24\% in RMSE. This confirms that urban phenomena are not merely defined by temporal autocorrelation, the external factors and spatial graph are required for accurate forecasting.
+
+XGBoost excels at capturing non-linear relationships between static external features and the target. However, it loses the sequential nature of time and spatial graph units. While it effectively modeled the vehicle and violence crime with external features, but it struggled in the Housing Price (RMSE +40.55\%) and Transport Demand task (RMSE +24.89\%), due to the lack of price spreading across neighboring LSOAs over time.
+
+TFT is a transformer-based model that utilizes temporal attention mechanisms to capture long-range temporal dependencies. While highly effective for pure time-series, it shows a higher performance than the machine learning model, but it has the gap with the Full Model, as lacking of spatial attention mechanism to model topological dependencies between nodes, which likely contributed to its lower performance compared to the Full Model.
+
+TabNet proved to be the most competitive baseline, specifically in the economic domain. In the Housing Price Estimation task, TabNet actually outperformed the Full Model in terms of MAE (£23,091 vs. £24,604), a relative difference of -6.55\%. This result highlights the importance of the external indicator of real estate markets, as housing prices are driven heavily by external features which TabNet’s attentive feature selection mechanism handles exceptionally well. However, despite TabNet's superior MAE, the Full Model achieved a better RMSE (£52396) and MAPE (5.9\%). This means TabNet was likely more suffered from large errors in spatially outlier regions. The Full Model, by enforcing spatial consistency through the graph construction, effectively preventing spatially incoherent predictions.
+
+\begin{table*}[h]
+\caption{Component Contribution Analysis (MAE \% Improvement).}
+\label{tab:contribution}
+\centering
+\begin{tabular}{llll}
+\toprule
+Prediction Task & Multimodal Features & Spatial Graph & Overall Improvement \\
+& (LSTM $\to$ NoAdj) & (NoAdj $\to$ Full) & (LSTM $\to$ Full) \\
+\midrule
+Theft & 20.02\% & 17.67\% & 34.15\% \\
+Violence & 4.80\% & 7.80\% & 12.23\% \\
+Vehicle Offences & 1.39\% & 0.55\% & 1.94\% \\
+Housing Prices & 12.01\% & 3.40\% & 15.01\% \\
+Transport Demand & 17.66\% & 37.51\% & 48.55\% \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Component Contribution Analysis}
+The component contribution analysis (Table \ref{tab:contribution}) reveals fundamental differences in the nature of urban phenomena.
+
+The housing price estimation task proved to be "feature-dominant." The inclusion of multimodal external features provided a 12.01\% improvement, nearly four times the contribution of the spatial graph (3.40\%). This aligns with hedonic price theory, suggesting that property value is primarily driven by intrinsic local attributes rather than purely by the diffusion of prices from immediate neighbours.
+
+Conversely, transport network demand exhibited a "Spatial-dominant" profile. The spatial graph contributed a massive 37.51\% improvement, significantly outweighing the feature contribution (17.66\%). This confirms that traffic is fundamentally a flow phenomenon constrained by spatial nodes that physically determined by the output of its neighbours. A model lacking explicit graph connectivity fails to capture these dependencies.
+
+Crime forecasting revealed the most complex dynamics. Theft and Violence exhibited a "balanced" profile, benefiting from both features (20.02\%; 7.8\%) and spatial structure (17.67\%; 4.80\%). This suggests theft is driven by a combination of environmental opportunity. Notably, the Vehicle Offences, which showed only a marginal overall improvement of 1.94\% (1.39\% from features and 0.55\% from the graph), with the highest MAPE among all tasks for full model(13.81\%). This suggests that the both spatial graph and external features contributed minor or even irrelevant gain upon the pure LSTM baseline. The possible reason is that vehicle crime is highly opportunistic and spatially erratic. The low feature contribution further indicates the current 15 static external features used are poor proxies for the actual targets of vehicle crime. Possible key indicators like parking density, street lighting, and traffic flow are not able to be captured by the LSOA-level aggregation.
+
+\subsection{Model Interpretability}
+In the context of urban governance, where decisions must be transparent and justifiable, accuracy without explainability is insufficient. A key success of this research was its ability to deliver not just predictions, but also explanations. Taking the three crime categories to conduct a sample interpretability analysis, the Figure \ref{fig:crime_feature_importance_heatmap} reveals that the model successfully learned distinct feature driven nature for different crime categories.
+
+For Theft, the model exhibits a strong dependency on public transport accessibility. The feature MeanPTAL (Public Transport Accessibility Level) dominates the importance landscape with a score of 0.118, which is the highest individual feature contribution recorded across all experiments. This is supported by StationsWithin500m (0.043) and NearestRail\_m (0.019). This aligns with common crime pattern theory, suggesting that theft in London is highly concentrated around transit hubs where high footfall creates a convergence of victims.
+
+In contrast, Vehicle Offences show a generally lower of importance score as MeanPTAL drops to near zero importance (0.005). Instead, physical street network characteristics became the top predictors, specifically StreetSegments (0.026) and StreetLength\_m (0.025). This Possibly indicates that vehicle crime is the physical configuration of the streetscape.
+
+Violence Against the Person displays a hybrid dependency profile. While it retains sensitivity to transport aspect (MeanPTAL: 0.029 \& StationsWithin500m: 0.023). Notably, Education\_HighLevel\_pct (0.018) is a stronger predictor. This suggests the framework identified that violence is driven by a complex nature of urban context.
+
+A crucial negative result is the sentiment feature (MeanSentiment) remains negligible across three tasks. This suggests that general public attitude is a irrelevant indicator when derived from public and commercial venue reviews. The analysis indicates that the public attitude of a specific area does not correlate with the socio-economic tensions or safety perceptions that drive criminal activity.
+
+\subsection{Methodological Design Justification}
+The adoption of a contiguity-based graph construction, rather than distance-based or $k$-Nearest Neighbor ($k$-NN) approaches, was driven by both the spatial heterogeneity of Greater London and practical data availability. Because LSOAs in central London are geographically small and dense while outer areas are large and sparse, fixed distance thresholds would risk fully connected graph in the center while leaving outer others as separate areas. Practically, the official binary database allowed to define adjacency strictly through boundary sharing. Through a parameter-free connection, this stability allowed the model to concentrate on the embedding dimensions rather than the graph topology itself.
+
+Regarding interpretability, permutation feature importance analysis was applied rather than other methods such as LIME \citep{Ribeiro2016} or SHAP \citep{LundbergLee2017}. While LIME and SHAP are powerful tools for explaining local individual predictions, but the model’s GCN component relies on its own embeddings and message passing of its neighbors features, LIME and SHAP would produce out-of-distribution samples that violate the model's structural assumptions. Permutation importance is more suited to the model design because it directly interrogates the global stability.
+
+\subsection{Limitations and Future Work}
+\subsubsection{Data Latency}
+A significant constraint is the reliance on static demographic data from the 2011 Census to model phenomena extending to 2023. While many structural urban characteristics remain stable, this assumption falters in neighbourhoods subject to rapid gentrification areas. This introduces a potential bias where the model may rely on outdated socio-economic indicators. For instance, the high predictive weight of Education\_HighLevel\_pct for Violence prediction must be interpreted with caution in areas where the demographic composition has shifted significantly over the decade. Future iterations must integrate dynamic administrative data or annual estimates to mitigate this temporal mismatch.
+
+\subsubsection{Uncertainty Quantification}
+The current framework provides deterministic point forecasts. However, for real-world decision support, understanding the confidence of a prediction is critical. Unlike probabilistic methods such as Gaussian Process Regression (GPR), which provide intrinsic uncertainty quantification and predictive variances \citep{JinXu2024}, the current model lacks explicit confidence intervals. Future work will explore to equip the framework with the ability to output uncertainty estimates alongside predictions.
+
+\subsubsection{Generalizability Enhancement}
+While this study validated the framework across multiple domains (crime, housing, transport), it was restricted spatially to a single city (London). A robust test of generalizability requires validating whether the learned spatial dependencies are universal. A critical future research direction is a Transfer Learning experiment. It might be proposed pre-training the model on London's data-rich environment and fine-tuning it on other cities with limited data.
+
+\subsubsection{Architectural Optimization}
+Finally, the current interpretability analysis relies on global permutation importance. However, urban drivers are likely non-stationary across space and time. Future work should implement dynamic spatio-temporal feature ranking by analyzing how feature importance shifts in both spatial graph and temporal sequence. Meanwhile, it should also optimize feature gating units, by incorporating learnable attention based gating units for each input feature before the fusion block. This would allow the model to suppress noise at the instance level automatically, and provide feature contribution score from the model's built-in mechanism.
+
+These limitations highlight the complexity of urban modeling, open several exciting trajectories for future work, including true multi-task learning \citep{Ruder2017, Zouetal2024}, dynamic graph structures \citep{Shanetal2025}, and transfer learning validation \citep{Zhuangetal2025}.
+
+% --- SECTION 7: CONCLUSION ---
+\section{Conclusion}
+This paper has documented the design, implementation, and comprehensive evaluation of a generalizable spatio-temporal framework for urban forecasting. The research confronted the challenge of task-specific, siloed models by developing and validating a single deep learning architecture by integrating multimodal data streams within the proposed unified architecture, the study successfully demonstrated that diverse urban phenomena can be modeled by a single adaptive system. The results, showing consistent performance gains over baselines. 
+
+The experimental results validate the central thesis: the structural complexity of cities requires a holistic modeling approach, not isolated silos. By holistically integrating spatial, temporal, and multimodal feature information, the framework not only achieves high predictive accuracy but also offers the transparency required for real world decision support,representing a practical step towards more unified and intelligent urban science.
+
+% --- APPENDICES ---
+\appendix
+\section{List of Symbols}
+Table \ref{tab:symbols} provides a list of symbols and acronyms used throughout the paper.
+
+\section{Model Architecture Details}
+Table \ref{tab:arch_breakdown} provides a layer-by-layer breakdown of the model architecture. A high-resolution schematic is provided in Figure \ref{fig:arch_hires}.
+
+\begin{figure*}[pos=h]
+    \centering
+    \includegraphics[width=\textwidth]{Detailed Architecture of the Spatio-Temporal Framework.png}
+    \caption{High-Resolution View of the Full Model Pipeline. It is divided into five sequential stages (0–4), each representing a component of the framework.}
+    \label{fig:arch_hires}
+\end{figure*}
+
+\begin{table*}[h]
+\caption{Layer-by-Layer Model Architecture Breakdown.}
+\label{tab:arch_breakdown}
+\centering
+\begin{tabular}{lllll}
+\toprule
+\# & Layer (Type) & Input Shape & Output Shape & Details \\
+\midrule
+1 & Temporal Embedding (Linear) & $(B, T, N, 1)$ & $(B, T, N, 64)$ & Projects 1D sequence into 64D latent space. \\
+2 & External Embedding (MLP) & $(N, F)$ & $(N, 64)$ & Embeds static features into 64D space. \\
+ & Initial Reshape & $(B, T, N, 64)$ & $(B \times T, N, 64)$ & Flattens batch and time dimensions. \\
+3 & MultiHeadGraphConv 1 & $(B \times T, N, 64)$ & $(B \times T, N, 64)$ & 1st GCN block (4 heads) with residual connection. \\
+4 & MultiHeadGraphConv 2 & $(B \times T, N, 64)$ & $(B \times T, N, 64)$ & 2nd GCN block (4 heads) captures 2-hop relations. \\
+ & Temporal Reshape & $(B \times T, N, 64)$ & $(B, T, N, 64)$ & Restores temporal dimension for fusion. \\
+5 & Cross-Attention \& Gating & $(B, T, N, 64)$ & $(B, T, N, 64)$ & Fuses external embedding into the sequence. \\
+6 & LSTM & $(B, T, N, 64)$ & $(B, T, N, 128)$ & Processes sequence to capture temporal dynamics. \\
+7 & Temporal Attention & $(B, T, N, 128)$ & $(B, N, 128)$ & Aggregates information across time. \\
+8 & Prediction Head (MLP) & $(B, N, 128)$ & $(B, N, 1)$ & Two-layer MLP (128->32->1) for final prediction. \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\section{Model Configuration}
+
+The temporal dynamic data was split into training set (70\%), validation set (15\%) for hyperparameter tuning and early stopping, test set (15\%) for final evaluation.
+
+The configuration presented in Table \ref{tab:refined_hyperparameters} is the result of a bayesian optimization strategy designed to identify the optimal trade-off between efficiency and performance. The search ranges are learning rate ($10^{-4}$ to $10^{-2}$), hidden dimensions (32 to 256), and dropout rates (0.1 to 0.5).
+
+\begin{table*}[h]
+\caption{Hyperparameter \& Architecture Settings.}
+\label{tab:refined_hyperparameters}
+\begin{tabular*}{\linewidth}{@{} llll @{}}
+\toprule
+Category & Parameter & Description & Value \\
+\midrule
+\multirow{5}{*}{\textbf{Hyperparameter}} 
+ & Sequence Length ($T$) & Historical time steps. & 12 \\
+ & Temporal Embedding Dim & Latent space size for initial temporal features. & 64 \\
+ & GCN Hidden Dimension & Number of filters in Graph Convolutional layers. & 128 \\
+ & Attention Heads & Number of heads in the Multi-Head Attention block. & 4 \\
+ & Dropout Rate & Probability of element zeroing for regularization. & 0.2 \\
+\midrule
+\multirow{7}{*}{\textbf{Training Setting}}
+ & Batch Size ($B$) & Samples processed per iteration. & 32 \\
+ & Optimizer & Algorithm for weight updates. & AdamW \\
+ & Learning Rate & Initial step size. & $1 \times 10^{-3}$ \\
+ & Weight Decay & L2 regularization coefficient. & $1 \times 10^{-4}$ \\
+ & Gradient Clipping & Maximum norm threshold to prevent exploding gradients. & 5.0 \\
+ & Max Epochs & Maximum training iterations. & 100 \\
+ & Early Stopping & Patience threshold for validation loss stagnation. & 10 \\
+\bottomrule
+\end{tabular*}
+\end{table*}
+
+\section{Training Protocols}
+
+To address the high memory footprint of the Multi-Head GCN components, Automatic Mixed Precision training using `torch.cuda.amp` was implemented. This technique dynamically scales the loss and casts specific operations to half-precision (FP16) while maintaining full precision (FP32) for master weights. This allowed for a batch size of 32 on the NVIDIA A100 GPU without memory overflow. For particularly memory-intensive tasks, a Tensor Processing Unit (TPU) v2 with 8 cores was also employed to ensure efficient processing.
+
+Given the complex nature of the datasets, standard regularization was insufficient. Two-tiered regularization strategy were employed:
+\begin{enumerate}
+    \item \textbf{Gradient Clipping:} To mitigate the exploding gradient problem inherent in LSTM training over long sequences, global gradient norms were clipped at a threshold of 5.0 before every optimizer step.
+    \item \textbf{Adaptive Learning Rate:} A `ReduceLROnPlateau` scheduler was utilized. The learning rate was reduced by a factor of 0.5 if the validation loss failed to improve for 5 consecutive epochs, allowing for fine-grained weight convergence in the final training stages.
+\end{enumerate}
+
+\begin{table}[pos=h]
+\caption{List of Symbols and Acronyms.}\label{tab:symbols}
+\begin{tabular*}{\linewidth}{@{} lll @{}}
+\toprule
+Symbol & Description & Context \\
+\midrule
+\multicolumn{3}{@{}l}{\textbf{Greek Letters}} \\
+$\sigma$ & Activation function & GCN formula \\
+$\alpha_{t}$ & Attention weight & Temporal attention \\
+$\odot$ & Element-wise product & Gating mechanism \\
+\midrule
+\multicolumn{3}{@{}l}{\textbf{Model Components}} \\
+$G, V, E$ & Graph, Vertices, Edges & Foundational structure \\
+$N$ & Number of nodes (LSOAs) & Graph size \\
+$A$ & Adjacency matrix & Defines connections \\
+$\hat{A}$ & $A+I$ & Self-loops \\
+$\hat{D}$ & Degree matrix of $\hat{A}$ & GCN normalization \\
+$X_{temp}$ & Time-series input & Primary model input \\
+$X_{ext}$ & External features input & Primary model input \\
+$B, T, F$ & Batch, Time, Features & Input dimensions \\
+$D_{emb}$ & Embedding dimension & Latent space size \\
+$h_{t}$ & Hidden state at time $t$ & LSTM output \\
+$c$ & Context vector & Aggregation \\
+$\hat{Y}$ & Predicted value & Model output \\
+\midrule
+\multicolumn{3}{@{}l}{\textbf{Acronyms}} \\
+GCN & Graph Conv. Network & Spatial modeling \\
+LSTM & Long Short-Term Memory & Temporal modeling \\
+BERT & Bidirectional Encoder & Sentiment analysis \\
+ & Reps. from Transformers & \\
+PTAL & Public Transport & A key input feature \\
+ & Accessibility Level & \\
+LSOA & Lower Layer Super & Spatial unit of analysis \\
+ & Output Area & \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\section{BERT Model for Sentiment Analysis}
+The sentiment analysis module was built around a pre-trained BERT model (nlptown/bert-base-multilingual-uncased-sentiment) from the Hugging Face repository. This transformer-based model was chosen for its ability to learn deep contextual relationships in text. The pipeline involved three steps:
+\begin{enumerate}
+    \item \textbf{Tokenization:} Raw text reviews were converted into a numerical format. Each review was broken into tokens, mapped to integer IDs, and truncated to a maximum of 512 tokens. Special tokens like `[CLS]` and `[SEP]` were added. The final input representation for each token is a sum of its token, segment, and position embeddings (Figure \ref{fig:bert_input}).
+    \item \textbf{Model Inference:} The tokenized text was fed into the BERT model, which produced a tensor of raw logits for each of the five sentiment classes (1 to 5 stars).
+    \item \textbf{Score Calculation:} A softmax function converted the logits into a probability distribution. A single, continuous sentiment score was then derived by calculating the weighted average of these probabilities (e.g., $(P(1*) \times 1) + (P(2*) \times 2) + \dots$).
+\end{enumerate}
+
+\begin{figure}[pos=h]
+	\centering
+	\includegraphics[width=\linewidth]{bert model.png}
+	\caption{The input representation for BERT. The final embedding for each token is a sum of its corresponding token, segment, and position embeddings.}
+	\label{fig:bert_input}
+\end{figure}
+
+Finally, these individual scores were aggregated to the LSOA level by calculating the mean (`MeanSentiment`) and standard deviation (`SentimentSD`) of all scores from venues within each LSOA (Figure \ref{fig:sentiment_map}).
+
+\begin{figure}[pos=h]
+    \centering
+    \includegraphics[width=\linewidth]{Choropleth Map of Mean Public Sentiment in London.png}
+        \caption{Choropleth Map of Mean Public Sentiment in London. This map visualises the spatial distribution of average public sentiment scores at the LSOA level, derived from Google venue reviews.}
+        \label{fig:sentiment_map}
+\end{figure}
+
+\section{Baseline Details}
+
+This appendix details the specific architectures, hyperparameters, and for the four baseline models shown in Table \ref{tab:baseline_specs}.
+
+\begin{table*}[h]
+\caption{Summary of Baseline Model Architectures and Hyperparameters.}
+\label{tab:baseline_specs}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l l l l l}
+\toprule
+\textbf{Model} & \textbf{Type} & \textbf{Architecture Components} & \textbf{Attention Mechanism} & \textbf{Key Hyperparameters} \\
+\midrule
+\textbf{ARIMA} & Statistical & \begin{tabular}[c]{@{}l@{}}Univariate AutoRegressive; \\ Integrated; Moving Average\end{tabular} & - & \begin{tabular}[c]{@{}l@{}}Order: $(1,1,1)$ \\ Stationarity: Enforced ($d=1$) \\ Fitting: Per LSOA (4,988 models)\end{tabular} \\
+\midrule
+\textbf{XGBoost} & Ensemble & \begin{tabular}[c]{@{}l@{}}Gradient Boosted Decision Trees\end{tabular} & - & \begin{tabular}[c]{@{}l@{}}Trees: 100 \\ Max Depth: 5 \\ Learning Rate: 0.1 \\ Inputs: Lags ($t-1 \dots t-3$)\end{tabular} \\
+\midrule
+\textbf{TabNet} & Neural & \begin{tabular}[c]{@{}l@{}}Feature Transformer + \\ Attentive Transformer\end{tabular} & \begin{tabular}[c]{@{}l@{}}Sequential Attention \end{tabular} & \begin{tabular}[c]{@{}l@{}}Batch Size: 1024 \\ Virtual Batch: 128 \\ Max Epochs: 50 \\ Optimizer: Adam (LR=0.02)\end{tabular} \\
+\midrule
+\textbf{TFT} & Neural & \begin{tabular}[c]{@{}l@{}}LSTM Encoder-Decoder + \\ Gated Residual Networks\end{tabular} & \begin{tabular}[c]{@{}l@{}}Multi-Head \\ Self-Attention\end{tabular} & \begin{tabular}[c]{@{}l@{}}Hidden Size: 16 \\ Heads: 1 \\ Dropout: 0.1 \\ Loss: QuantileLoss\end{tabular} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
+\section{Acknowledgements}
+This work was supervised by Dr. Roberto Murcio Villanueva (Primary Supervisor) and Dr. Huanfa Chen (Secondary Supervisor) from the Bartlett Center for Advanced Spatial Analysis, University College London.
+
+\section{Ethical Considerations}
+\label{app:data_ethics}
+
+The datasets used in this study are derived from open government sources and are compliant with standard open data licenses. The sentiment analysis component utilized review data retrieved via the Google Places API. To address potential privacy and licensing concerns, the following strict data governance protocols were implemented:
+
+\begin{enumerate}
+    \item \textbf{Public Nature of Data:} Data collection was strictly limited to publicly accessible reviews of commercial and public venues (e.g., parks, transit hubs, restaurants). No private user data or non-public content was accessed.
+    \item \textbf{Anonymization:} The data pipeline was designed to be not stored or analyze any information regarding user identity such as usernames, user IDs, or profile URLs.
+    \item \textbf{Aggregation and Obfuscation:} The raw text of reviews was processed through the BERT model to extract numerical sentiment scores and immediately discarded. Only the aggregated statistical metrics (Mean and Standard Deviation) were retained at the LSOA level. As an LSOA contains an average of 1,500 residents and dozens of venues, this spatial aggregation renders it impossible to reverse-engineer or attribute specific sentiment scores to individual users.
+    \item \textbf{Derivative Works:} The final dataset consists solely of derived metrics (sentiment scores), not the reproduction of the original proprietary text data, ensuring compliance with API Terms of Service regarding data caching and redistribution.
+\end{enumerate}
+
+\section{Declaration of Competing Interest}
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\section{Code Availability}
+The complete Python code for data processing, model implementation, and experimental analysis, along with the processed datasets, is available in the following GitHub repository: \url{https://github.com/IflyNY2PR/CASA0004.git}
+
+% --- BIBLIOGRAPHY ---
+\bibliographystyle{cas-model2-names}
+\bibliography{cas-refs}
+
+\end{document}

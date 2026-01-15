@@ -1,0 +1,17 @@
+TRANSPORT DATA MERGE SUMMARY
+==================================================
+
+Source Files:
+  - StationFootfall_2019.csv
+  - StationFootfall_2020.csv
+  - StationFootfall_2021.csv
+  - StationFootfall_2022.csv
+  - StationFootfall_2023.csv
+
+Total Records: 767,516
+Date Range: 2019-01-01 to 2023-12-31
+Number of Stations: 436
+Columns: TravelDate, DayOFWeek, Station, EntryTapCount, ExitTapCount
+
+Total Entry Taps: 5,383,358,831
+Total Exit Taps: 5,420,891,230
