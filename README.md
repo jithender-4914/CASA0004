@@ -23,9 +23,6 @@ If you use this work in your research, please cite:
 - **Institution**: University College London (UCL)
 - **Department**: Centre for Advanced Spatial Analysis (CASA), Bartlett Faculty of the Built Environment
 - **Address**: 90 Tottenham Court Road, London, W1T 4TJ, United Kingdom
-- **Primary Supervisor**: Dr. Roberto Murcio Villanueva
-- **Secondary Supervisor**: Dr. Huanfa Chen
-
 ---
 
 **Last Updated**: January 2026  
