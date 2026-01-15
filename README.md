@@ -719,10 +719,6 @@ While specific to the London case study, the framework reveals constraints and o
 ## 📄 License
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
-## 🤝 Acknowledgements
-- **Supervision**: Dr. Roberto Murcio Villanueva & Dr. Huanfa Chen (CASA, UCL)
-- **Data Providers**: Office for National Statistics, Transport for London, Metropolitan Police Service, Google Places API
-- **Compute Resources**: Google Colab Pro and UCL Research Computing
 
 ---
 © 2026 Yunfei Guo. All Rights Reserved.
