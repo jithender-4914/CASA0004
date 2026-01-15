@@ -24,7 +24,7 @@ If you use this work in your research, please cite:
 ---
 
 **Last Updated**: January 2026  
-**Version**: 1.0.0  
+**Version**: 0.0.99 
 
 ## Overview
 
