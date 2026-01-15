@@ -23,8 +23,8 @@ If you use this work in your research, please cite:
 
 ---
 
-**Last Updated**: September 2025  
-**Version**: 0.9.9  
+**Last Updated**: January 2026  
+**Version**: 1.0.0  
 
 ## Overview
 
@@ -44,15 +44,16 @@ The framework combines:
 - **Attention mechanisms** for feature importance weighting
 
 ### Validation
-Applied to two distinct urban prediction tasks in London:
+Applied to three distinct urban prediction tasks in London:
 1. **Crime Forecasting**: Monthly crime counts across categories
 2. **Housing Price Estimation**: Quarterly median price changes
+3. **Transport Usage Forecasting**: Weekly station footfall prediction
 
 ### Performance
 - **34.15% MAE reduction** in crime prediction vs. LSTM baseline
 - **R² = 0.910** for theft prediction (90%+ variance explained)
 - **15.01% MAE improvement** in housing price estimation
-- **R² = 0.801** for housing price prediction
+- **Robust adaptability** demonstrated across varying spatial scales (LSOAs vs. Stations)
 
 The results validate that a single, adaptable architecture can effectively model diverse urban phenomena while providing transparency for real-world decision support.
 
@@ -162,7 +163,7 @@ The framework builds upon established deep learning paradigms:
 
 ## 📊 Case Studies
 
-The framework's **generalizability** was rigorously tested across two heterogeneous urban prediction domains, demonstrating cross-domain applicability and robust performance.
+The framework's **generalizability** was rigorously tested across three heterogeneous urban prediction domains, demonstrating cross-domain applicability and robust performance.
 
 ### 🚔 Case Study 1: Urban Crime Forecasting (`ex1_crime/`)
 
@@ -200,7 +201,19 @@ The framework's **generalizability** was rigorously tested across two heterogene
   <p><em>Figure 8: London house price trends over time showing market cycles and regional variations</em></p>
 </div>
 
-### 🔄 Cross-Domain Validation Strategy
+### � Case Study 3: Transport Usage Forecasting (`ex3_transport/`)
+
+**Objective**: Forecast weekly station footfall acr Transport Usage |
+|--------|-------------------|-------------------|-----------------|
+| **Temporal Pattern** | High-frequency, seasonal | Low-frequency, cyclical | Very high frequency, periodic |
+| **Spatial Structure** | Clustered hotspots | Smooth gradients | Network topology |
+| **Feature Importance** | Demographics, policy | Economics, amenities | Connectivity, events |
+| **Spatial Unit** | LSOA (Polygon) | LSOA (Polygon) | Station (Point) |
+
+This multi-domain approach ensures the framework's **robustness** across different:
+- **Data distributions** (count vs. continuous vs. flow)
+- **Temporal dynamics** (monthly vs. quarterly vs. weekly)  
+- **Spatial patterns** (area-based vs. network-based
 
 | Aspect | Crime Forecasting | Housing Estimation |
 |--------|-------------------|-------------------|
@@ -253,10 +266,16 @@ The integrated dataset comprises **15 static external features** spanning multip
 - **Metric**: Median house prices per LSOA
 - **Preprocessing**: Price normalization, seasonal adjustment, market trend removal
 
+#### **Transport Footfall** (`ex3_transport/`)
+- **Source**: Transport for London (TfL)
+- **Temporal Coverage**: 2019-2023 (weekly)
+- **Metric**: Entry/Exit tap counts per station
+- **Preprocessing**: Missing data imputation, spatial filtering, outlier removal
+
 ### 📁 Dataset Statistics
 
-- **Spatial Units**: 4,835 LSOAs
-- **Temporal Points**: 48 months (crime) / 16 quarters (housing)
+- **Spatial Units**: 4,835 LSOAs / ~436 Stations
+- **Temporal Points**: 48 months (crime) / 16 quarters (housing) / 260 weeks (transport)
 - **Feature Dimensions**: 15 static + temporal targets
 
 ## ⚙️ Model Details
@@ -321,7 +340,7 @@ CASA0004/
 │   ├── data_combination_clean.ipynb     # Main data processing notebook
 │   ├── gcn_feature_matrix_optimal.csv  # Final model-ready dataset
 │   ├── feature_heatmap.ipynb           # Feature analysis and visualization
-│   ├── create_core_requirements.py     # Environment management
+│   ├── python_environment_migration.py # Environment management
 │   └── [subdirectories]/               # Raw data organized by theme
 │       ├── economic/                    # Economic indicators
 │       ├── Infrastructure/              # Transport and utilities
@@ -340,7 +359,12 @@ CASA0004/
 │   ├── housing_final.ipynb             # Housing analysis and modeling
 │   └── housing_test.ipynb              # Model validation experiments
 │
-├── 📈 graph&output/                # Visualizations and results
+├── � ex3_transport/               # Transport usage prediction experiment
+│   ├── test_full.ipynb                 # Transport model implementation
+│   ├── StationFootfall_Merged.csv      # Transport dataset
+│   └── merge_analysis.png              # Data analysis plots
+│
+├── �📈 graph&output/                # Visualizations and results
 │   ├── [architecture_diagrams]/        # Framework visualization
 │   ├── [performance_plots]/            # Results and metrics
 │   └── [analysis_figures]/             # Feature analysis plots
@@ -354,7 +378,8 @@ CASA0004/
 
 ### 🔧 Key Files Description
 
-| File/Directory | Purpose | Key Outputs |
+| Fex3_transport/test_full.ipynb` | Transport model | Station footfall forecasts |
+| `ile/Directory | Purpose | Key Outputs |
 |----------------|---------|-------------|
 | `data_combination_clean.ipynb` | Master data pipeline | Feature matrices, documentation |
 | `crime_final.ipynb` | Crime model implementation | Performance metrics, predictions |  
@@ -408,11 +433,15 @@ jupyter notebook data_combination_clean.ipynb
 #### 4. **Model Execution**
 ```bash
 # Crime forecasting
-cd ex1_crime/
-jupyter notebook crime_final.ipynb
 
-# Housing price estimation  
-cd ex2_housing/
+# Transport usage forecasting
+cd ex3_transport/
+jupyter notebook test_full.ipynb
+```
+
+## 📈 Results
+
+The framework was rigorously evaluated through comprehensive ablation studies across three
 jupyter notebook housing_final.ipynb
 ```
 
