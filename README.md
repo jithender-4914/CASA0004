@@ -101,7 +101,7 @@ The framework was evaluated using data from **Greater London**, providing a robu
 - **Data Richness**: Comprehensive multimodal datasets spanning demographics, infrastructure, and socioeconomic indicators
 
 <div align="center">
-  <img src="graph&output/Map%20of%20the%20London%20Study%20Area.png" alt="Study Area" width="700"/>
+  <img src="graph&output&publication/Map%20of%20the%20London%20Study%20Area.png" alt="Study Area" width="700"/>
   <p><em>Figure 2: Lower Layer Super Output Areas (LSOAs) in Greater London study area</em></p>
 </div>
 
