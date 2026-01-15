@@ -32,7 +32,7 @@ If you use this work in your research, please cite:
 ## Overview
 
 <div align="center">
-  <img src="graph&output&publication/work%20Flow_new.png" alt="Research Flow" width="800"/>
+  <img src="graph&output&publication/work%2flow_new.png" alt="Research Flow" width="800"/>
   <p><em>Figure 1: Research workflow overview</em></p>
 </div>
 
