@@ -245,7 +245,7 @@ The framework's **generalizability** was rigorously tested across three heteroge
 
 <div align="center">
   <img src="graph&output&publication/Crime%20Trends%20in%20London%20Over%20Time%20by%20Category.png" alt="Crime Trends" width="800"/>
-  <p><em>Figure 7: Temporal trends in crime categories across London showing seasonal patterns and COVID-19 impact</em></p>
+  <p><em>Figure 7: Temporal trends in crime categories across London</em></p>
 </div>
 
 ### 🏠 Case Study 2: Housing Price Estimation
@@ -272,7 +272,7 @@ The framework's **generalizability** was rigorously tested across three heteroge
 
 <div align="center">
   <img src="graph&output&publication/London%20House%20Price%20Trends%20Over%20Time.png" alt="Housing Trends" width="800"/>
-  <p><em>Figure 8: London house price trends over time showing market cycles and regional variations</em></p>
+  <p><em>Figure 8: London house price trends over time</em></p>
 </div>
 
 ### 🚆 Case Study 3: Transport Network Demand
@@ -297,6 +297,12 @@ The framework's **generalizability** was rigorously tested across three heteroge
 2. Highest spatial importance (37.51% improvement) confirming spatial-dominant phenomena
 3. Very high temporal frequency (daily vs. monthly/quarterly) tests temporal scalability
 4. Clear infrastructure applications (capacity planning, service optimization)
+
+<div align="center">
+  <img src="graph&output&publication/footfall_trends.png" alt="Footfall Trends" width="800"/>
+  <p><em>Figure 9: Transport network demand trends in London</em></p>
+</div>
+
 
 ### 📊 Cross-Domain Comparison
 
@@ -380,7 +386,7 @@ A core innovation of this research is the **principled data fusion pipeline** th
 
 <div align="center">
   <img src="graph&output&publication/data_pre.png" alt="Data Processing Pipeline" width="900"/>
-  <p><em>Figure 9: Multimodal data processing pipeline for integrating diverse urban datasets</em></p>
+  <p><em>Figure 10: Multimodal data processing pipeline for integrating diverse urban datasets</em></p>
 </div>
 
 ### 🏗️ Feature Engineering
@@ -389,7 +395,7 @@ The integrated dataset comprises **15 static external features** spanning multip
 
 <div align="center">
   <img src="graph&output&publication/Feature%20Correlation%20Heatmap.png" alt="Feature Correlation" width="700"/>
-  <p><em>Figure 10: Feature correlation heatmap revealing multi-dimensional urban relationships</em></p>
+  <p><em>Figure 11: Feature correlation heatmap revealing multi-dimensional urban relationships</em></p>
 </div>
 
 **Key Insights from Correlation Analysis**:
