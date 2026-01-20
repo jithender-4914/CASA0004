@@ -31,7 +31,7 @@ If you use this work in your research, please cite:
 - **ORCID**: 0009-0002-1466-5807
 - **Email**: ucbvuoi@ucl.ac.uk / ssyyg6@gmail.com
 - **Institution**: University College London (UCL)
-- **Department**: Centre for Advanced Spatial Analysis (CASA), Bartlett Faculty of the Built Environment
+- **Department**: Centre for Advanced Spatial Analysis (CASA)
 - **Address**: 90 Tottenham Court Road, London, W1T 4TJ, United Kingdom
 ---
 
