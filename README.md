@@ -9,10 +9,20 @@ The project develops and evaluates a general-purpose, multimodal spatio-temporal
 
 ## 📚 Citation
 
+The work has been published in **Information Fusion (2026)**.
+
 If you use this work in your research, please cite:
 
+> Yunfei Guo, Multimodal Spatio-Temporal Fusion: A Generalizable GCNLSTM with Attention Framework for Urban Application, Information Fusion (2026), doi: [10.1016/j.inffus.2026.104164](https://doi.org/10.1016/j.inffus.2026.104164)
+
 ```bibtex
-@article{#undo
+@article{Guo2026Multimodal,
+  title = {Multimodal Spatio-Temporal Fusion: A Generalizable GCNLSTM with Attention Framework for Urban Application},
+  author = {Guo, Yunfei},
+  journal = {Information Fusion},
+  year = {2026},
+  doi = {10.1016/j.inffus.2026.104164},
+  url = {https://doi.org/10.1016/j.inffus.2026.104164}
 }
 ```
 
@@ -26,8 +36,7 @@ If you use this work in your research, please cite:
 ---
 
 **Last Updated**: January 2026  
-**Version**: 0.9.9  
-**Manuscript Status**: Completed 
+**Manuscript Status**: Published in Information Fusion (2026) 
 
 ## Overview
 
