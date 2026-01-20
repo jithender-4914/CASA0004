@@ -29,7 +29,7 @@ If you use this work in your research, please cite:
 ### Author Information
 - **Author**: Yunfei Guo
 - **ORCID**: 0009-0002-1466-5807
-- **Email**: ucbvuoi@ucl.ac.uk
+- **Email**: ucbvuoi@ucl.ac.uk / ssyyg6@gmail.com
 - **Institution**: University College London (UCL)
 - **Department**: Centre for Advanced Spatial Analysis (CASA), Bartlett Faculty of the Built Environment
 - **Address**: 90 Tottenham Court Road, London, W1T 4TJ, United Kingdom
