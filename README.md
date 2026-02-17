@@ -38,6 +38,28 @@ If you use this work in your research, please cite:
 **Last Updated**: January 2026  
 **Manuscript Status**: Published in Information Fusion (2026) 
 
+
+## 🧭 Pipeline-First Repository Navigation
+
+To match the workflow
+
+**CSV Files → Load Data → Normalize Data → Create Graph (Adjacency Matrix) → Temporal Embedding → GCN → LSTM → Attention → Prediction**,
+
+a dedicated pipeline-oriented structure is now available under [`pipeline/`](pipeline/):
+
+- `pipeline/01_load_data/`
+- `pipeline/02_normalize_data/`
+- `pipeline/03_create_graph_adjacency_matrix/`
+- `pipeline/04_temporal_embedding/`
+- `pipeline/05_gcn_spatial_learning/`
+- `pipeline/06_lstm_time_learning/`
+- `pipeline/07_attention/`
+- `pipeline/08_prediction/`
+
+Each stage README points to the existing notebooks, scripts, and datasets in this repository so you can follow the pipeline end-to-end without breaking prior file paths.
+
+Pipeline stages also include `links/` subfolders with symlinks to key source notebooks/data/model artifacts, so files are organized by step while remaining in their original canonical locations.
+
 ## Overview
 
 <div align="center">
