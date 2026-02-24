@@ -593,7 +593,7 @@ source casa0004_env/bin/activate  # On Windows: casa0004_env\Scripts\activate
 # Install dependencies (ensure correct torch version for your CUDA)
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 pip install torch_geometric
-pip install -r data&preprocessing/data_science_core_requirements_latest.txt
+pip install -r requirements.txt
 ```
 
 #### 3. **Data Preparation** 
