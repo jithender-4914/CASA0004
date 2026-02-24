@@ -1,0 +1,28 @@
+# Minimal dependencies required to run the main CASA0004 pipeline notebooks.
+# Install PyTorch and PyG first with the correct wheels for your OS/CUDA setup,
+# then install this file:
+#   pip install -r requirements.txt
+
+# Core scientific stack
+numpy
+pandas
+scipy
+scikit-learn
+matplotlib
+seaborn
+
+# Notebook execution
+jupyter
+
+# Geospatial preprocessing
+geopandas
+fiona
+shapely
+geopy
+requests
+
+# Modeling utilities used in core notebooks
+optuna
+statsmodels
+tqdm
+pillow
